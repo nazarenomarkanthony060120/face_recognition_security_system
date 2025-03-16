@@ -11,6 +11,7 @@ npx expo customize metro.config.js
 npx expo install nativewind tailwindcss@^3.4.17 react-native-reanimated@3.16.2 react-native-safe-area-context
 npx tailwindcss init 
 npm i @react-native-firebase/auth
+npm install react-native-vector-icons
 
 # Tips install Packages
 npx react-native-asset
