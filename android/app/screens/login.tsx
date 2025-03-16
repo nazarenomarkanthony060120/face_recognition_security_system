@@ -13,9 +13,10 @@ const login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const { mutate: login, isPending, error } = useLogin()
+  const { mutate: login, isPending, error, isSuccess } = useLogin()
 
   const handleLogin = () => {
+    console.log(11111111111)
     login(
       { email, password },
       {
@@ -51,8 +52,9 @@ const login = () => {
         </Text>
         <Input className=" w-full placeholder:text-slate-400" placeholder="Enter Email" value={email} onChangeText={(value) => { setEmail(value) }}></Input>
         <Input className=" w-full placeholder:text-slate-400" placeholder="Enter Password" value={password} onChangeText={(value) => { setPassword(value) }} secureTextEntry></Input>
-        <Button className="uppercase font-[18]" onPress={() => {handleLogin}} loading={isPending}>Login</Button>
+        <Button className="uppercase font-[18]" onPress={handleLogin} loading={isPending}>Login</Button>
         <Text>{error && <Text style={{ color: "red" }}>{error.message}</Text>}</Text>
+        <Text>{isSuccess && <Text style={{ color: "green" }}>Login Successful</Text>}</Text>
       </Animated.View>
 
       <Animated.View entering={FadeInUp.delay(700).duration(500).damping(1).springify()} className="mt-10 flex items-center px-5 gap-2">

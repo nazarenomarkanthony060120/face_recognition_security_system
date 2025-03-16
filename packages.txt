@@ -6,6 +6,7 @@ npm i @tanstack/react-query
 npx expo install @dev-plugins/react-query
 npx expo install expo-router react-native-safe-area-context react-native-screens expo-linking expo-constants expo-status-bar
 npm install firebase
+npm install dotenv
 npm install @react-native-async-storage/async-storage
 npx expo customize metro.config.js
 npx expo install nativewind tailwindcss@^3.4.17 react-native-reanimated@3.16.2 react-native-safe-area-context
