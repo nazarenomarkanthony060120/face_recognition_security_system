@@ -1,0 +1,25 @@
+# Packages
+
+npx create-expo-app // install this
+npx create-expo-stack@latest --nativewind // dont use this
+npm i @tanstack/react-query
+npx expo install @dev-plugins/react-query
+npx expo install expo-router react-native-safe-area-context react-native-screens expo-linking expo-constants expo-status-bar
+npm install firebase
+npm install @react-native-async-storage/async-storage
+npx expo customize metro.config.js
+npx expo install nativewind tailwindcss@^3.4.17 react-native-reanimated@3.16.2 react-native-safe-area-context
+npx tailwindcss init 
+npm i @react-native-firebase/auth
+
+# Tips install Packages
+npx react-native-asset
+npm install expo-font
+npx expo install expo-font
+npx expo install expo-image
+npx expo install lottie-react-native
+npm install @lottiefiles/dotlottie-react
+
+
+# Tips
+https://dev.to/iammtander/custom-fonts-in-react-native-pro-tip-4693
