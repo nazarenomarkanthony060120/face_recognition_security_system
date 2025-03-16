@@ -1,8 +1,16 @@
-import { Stack } from 'expo-router'
-import React from 'react'
+import { Stack } from "expo-router"
+import React from "react"
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
+import "../global.css"
 
-const Layout = () => {
-  return <Stack screenOptions={{ headerShown: false }}></Stack>
+const client = new QueryClient()
+
+const RootLayout = () => {
+  return (
+    <QueryClientProvider client={client}>
+      <Stack screenOptions={{ headerShown: false }} />
+    </QueryClientProvider>
+  )
 }
 
-export default Layout
+export default RootLayout
