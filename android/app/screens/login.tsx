@@ -58,7 +58,7 @@ const login = () => {
       </Animated.View>
 
       <Animated.View entering={FadeInUp.delay(700).duration(500).damping(1).springify()} className="mt-10 flex items-center px-5 gap-2">
-        <Text className="text-white text-lg">or</Text>
+        <Text className="text-2xl">or</Text>
         <View className="flex-row gap-4 mt-4">
           <Icon className="p-3 bg-white rounded-full" name={'google'} size={24} color="red"/>
           <Icon className="p-3 bg-white rounded-full" name={'facebook-square'} size={24} color="blue"/>
