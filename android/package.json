@@ -1,5 +1,5 @@
 {
-  "name": "android",
+  "name": "face-recognition-security-system",
   "main": "expo-router/entry",
   "version": "1.0.0",
   "scripts": {

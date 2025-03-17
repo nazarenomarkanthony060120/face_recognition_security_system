@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "android",
-    "slug": "android",
+    "name": "Face Recognition Security System",
+    "slug": "Face Recognition Security System",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "android",
+    "scheme": "Face Recognition Security System",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
