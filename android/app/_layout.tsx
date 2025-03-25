@@ -1,14 +1,19 @@
+import "../global.css"
 import { Stack } from "expo-router"
 import React from "react"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
-import "../global.css"
+import { AuthProvider } from "../context/auth"
+import { StatusBar } from "react-native"
 
 const client = new QueryClient()
 
 const RootLayout = () => {
   return (
     <QueryClientProvider client={client}>
-      <Stack screenOptions={{ headerShown: false }} />
+      <AuthProvider>
+        <Stack screenOptions={{ headerShown: false }} />
+        <StatusBar backgroundColor="black"></StatusBar>
+      </AuthProvider>
     </QueryClientProvider>
   )
 }
