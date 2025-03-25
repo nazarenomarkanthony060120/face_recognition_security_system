@@ -17,6 +17,7 @@ const LoginController = () => {
     login(data as LoginRequest)
   }
   
+
   return (
     <Animated.View entering={FadeInUp.delay(600).duration(500).damping(1).springify()} className="pt-28 flex items-center px-5 gap-2">
       <Text style={{ color: "white", fontSize: 24, fontWeight: "bold" }}>Login</Text>

@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, ButtonProps } from 'react-native'
+import { View, Text, TouchableOpacity, ButtonProps, ActivityIndicator } from 'react-native'
 import React from 'react'
 import { CustomButtonProps } from '@/utils/types'
 
@@ -19,7 +19,7 @@ const Button = ({ onPress, loading, icon, children, className}: CustomButtonProp
     <TouchableOpacity onPress={onPress} className={'w-full flex-row bg-sky-300 p-5 rounded-2xl'}>
       <View className='flex-row justify-center items-center w-full'>
         { icon && icon}
-        <Text className={className}>{children}</Text>
+        { loading ? <ActivityIndicator /> : <Text className={className}>{children}</Text>}
       </View>
     </TouchableOpacity>
   )
