@@ -11,7 +11,6 @@ const DashboardProfile = () => {
           className="h-14 w-14 rounded-full border-red-400 border-4"
         />
         <Icon name="user" className='absolute' size={14} color="black" />
-        
       </TouchableOpacity>
     </View>
   )
