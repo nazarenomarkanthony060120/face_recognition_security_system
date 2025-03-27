@@ -16,12 +16,6 @@ const Dashboard = () => {
           <DashboardStudentList />
           <DashboardStudentList />
           <DashboardStudentList />
-          <DashboardStudentList />
-          <DashboardStudentList />
-          <DashboardStudentList />
-          <DashboardStudentList />
-          <DashboardStudentList />
-          <DashboardStudentList />
         </View>
       </ScrollView>
       <DashboardAddStudent />

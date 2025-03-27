@@ -10,7 +10,7 @@ const DashboardStudent = () => {
         className='h-full rounded-lg w-24'
       />
       <View>
-        <Typo className='font-bold'>Mark Anthony Nazareno</Typo>
+        <Typo className='font-bold'>Student Test</Typo>
         <Typo>ID: 1231231</Typo>
         <Typo>Grade: 2</Typo>
         <Typo>Yr: 2023</Typo>
