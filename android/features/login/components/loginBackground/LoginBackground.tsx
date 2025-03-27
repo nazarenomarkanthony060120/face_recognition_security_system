@@ -4,7 +4,7 @@ import { BACKGROUND_ICON } from '@/constants/image'
 
 const { width, height } = Dimensions.get("window")
 
-const LoginBackground = () => {
+export const LoginBackground = () => {
   return (
     <Image
       className={'absolute w-full h-full'}
@@ -13,5 +13,3 @@ const LoginBackground = () => {
     />
   )
 }
-
-export default LoginBackground
