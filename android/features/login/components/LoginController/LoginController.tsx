@@ -7,9 +7,12 @@ import Animated, { FadeInUp } from 'react-native-reanimated'
 import Input from '@/components/input'
 import Button from "@/components/button"
 import { LoginRequest } from '@/utils/types'
+import Typo from '@/components/typo'
+import LoginInputContainer from './components/LoginInputContainer/LoginInputContainer'
+import LoginActionContainer from './components/LoginActionContainer/LoginActionContainer'
 
 
-const LoginController = () => {
+export const LoginController = () => {
   const { control, handleSubmit } = useForm()
   const { mutate: login, error, isSuccess, isPending } = useLogin()
 
@@ -19,29 +22,11 @@ const LoginController = () => {
   
 
   return (
-    <Animated.View entering={FadeInUp.delay(600).duration(500).damping(1).springify()} className="pt-28 flex items-center px-5 gap-2">
-      <Text style={{ color: "white", fontSize: 24, fontWeight: "bold" }}>Login</Text>
-      <Controller
-        control={control}
-        name="email"
-        rules={{ required: 'Email is required' }}
-        render={({ field: { onChange, value } }) => (
-          <Input className=" w-full placeholder:text-slate-400" placeholder="Enter Email" value={value} onChangeText={onChange}></Input>
-        )}
-      />
-      <Controller
-        control={control}
-        name="password"
-        rules={{ required: 'Password is required' }}
-        render={({ field: { onChange, value } }) => (
-          <Input className=" w-full placeholder:text-slate-400" placeholder="Enter Password"value={value} onChangeText={onChange} secureTextEntry></Input>
-        )}
-      />
-      <Button className="uppercase font-[18]" onPress={handleSubmit(onSubmit)} loading={isPending}>Login</Button>
-      <Text>{error && <Text style={{ color: "red" }}>{error.message}</Text>}</Text>
-      <Text>{isSuccess && <Text style={{ color: "green" }}>Login Successful</Text>}</Text>
+    <Animated.View entering={FadeInUp.delay(600).duration(500).damping(1).springify()} className="pt-6 px-5 gap-2">
+      <Typo className='text-white text-[24px] font-bold text-center'>Boarding House App</Typo>
+      <LoginInputContainer control={control} />
+      <LoginActionContainer handleSubmit={handleSubmit} isPending={isPending} onSubmit={onSubmit} />
+      <Typo>{error && <Typo className='text-red'>{error.message}</Typo>}</Typo>
     </Animated.View>
   )
 }
-
-export default LoginController
