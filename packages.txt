@@ -23,6 +23,7 @@ npx expo install expo-font
 npx expo install expo-image
 npx expo install lottie-react-native
 npm install @lottiefiles/dotlottie-react
+npm install --save-dev prettier eslint eslint-config-prettier eslint-plugin-unused-imports
 
 
 # Tips
