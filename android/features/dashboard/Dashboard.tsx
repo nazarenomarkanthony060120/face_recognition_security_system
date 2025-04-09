@@ -1,9 +1,8 @@
 import React from 'react'
 import DashboardStudentList from './dashboardStudentList/DashboardStudentList'
 import Background from '../common/Background'
-import DashboardLogout from './dashboardLogout/DashboardLogout'
 import DashboardAddStudent from './dashboardAddStudent/DashboardAddStudent'
-import { ScrollView, Text, View } from 'react-native'
+import { ScrollView, View } from 'react-native'
 import DashboardHeader from './dashboardHeader/DashboardHeader'
 
 const Dashboard = () => {
