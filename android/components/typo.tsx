@@ -1,10 +1,25 @@
-import { View, Text } from 'react-native'
+import { View, Text, TextStyle } from 'react-native'
 import React from 'react'
-import { TypoProps } from '@/utils/types'
+import { TextProps } from 'react-native-svg'
 
-const Typo = ({ children, className }: TypoProps) => {
+type TypoProps = {
+  size?: number
+  color?: string
+  fontWeight?: TextStyle['fontWeight']
+  children: any | null
+  style?: TextStyle
+  textProps?: TextProps
+  className?: string
+  icon?: React.ReactNode
+  isNeed?: boolean
+}
+
+const Typo = ({ children, className, icon, isNeed = false }: TypoProps) => {
   return (
-    <View className=''>
+    <View
+      className={`flex-row gap-1 items-center ${isNeed ? '' : 'justify-center'} `}
+    >
+      {icon && icon}
       <Text className={className}>{children}</Text>
     </View>
   )
