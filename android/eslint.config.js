@@ -2,21 +2,21 @@ module.exports = {
   root: true,
   env: {
     es6: true,
-    node: true
+    node: true,
   },
   extends: [
     'eslint:recommended',
     'plugin:react/recommended',
     'plugin:react-native/all',
-    'prettier'
+    'prettier',
   ],
   plugins: ['react', 'react-native', 'unused-imports'],
   parserOptions: {
     ecmaVersion: 2021,
     sourceType: 'module',
     ecmaFeatures: {
-      jsx: true
-    }
+      jsx: true,
+    },
   },
   rules: {
     'react/react-in-jsx-scope': 'off', // For React 17+
@@ -28,8 +28,8 @@ module.exports = {
         vars: 'all',
         varsIgnorePattern: '^_',
         args: 'after-used',
-        argsIgnorePattern: '^_'
-      }
-    ]
-  }
+        argsIgnorePattern: '^_',
+      },
+    ],
+  },
 }

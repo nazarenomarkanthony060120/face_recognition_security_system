@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { signUp, signIn as login} from '@/api/index'
+import { signUp, signIn as login } from '@/api/index'
 
 export const useAuth = () => {
   const queryClient = useQueryClient()
@@ -21,7 +21,6 @@ export const useAuth = () => {
       mutationFn: signUp,
     })
   }
-
 
   return {
     signIn,

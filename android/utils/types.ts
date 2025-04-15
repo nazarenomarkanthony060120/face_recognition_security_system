@@ -1,7 +1,7 @@
-import { Href } from "expo-router"
-// import { Firestore, Timestamp } from "firebase/firestore" 
-import { Icon } from "phosphor-react-native"
-import React, { ReactNode } from "react"
+import { Href } from 'expo-router'
+// import { Firestore, Timestamp } from "firebase/firestore"
+import { Icon } from 'phosphor-react-native'
+import React, { ReactNode } from 'react'
 import {
   ActivityIndicator,
   ActivityIndicatorProps,
@@ -13,7 +13,7 @@ import {
   TextStyle,
   TouchableOpacityProps,
   ViewStyle,
-} from "react-native"
+} from 'react-native'
 
 export type ScreenWrapperProps = {
   style?: ViewStyle
@@ -28,7 +28,7 @@ export type ModalWrapperProps = {
 export type TypoProps = {
   size?: number
   color?: string
-  fontWeight?: TextStyle["fontWeight"]
+  fontWeight?: TextStyle['fontWeight']
   children: any | null
   style?: TextStyle
   textProps?: TextProps
@@ -82,6 +82,6 @@ export type ResponseType = {
 }
 
 export type LoginRequest = {
-  email: string,
+  email: string
   password: string
-} 
+}
