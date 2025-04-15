@@ -4,7 +4,7 @@ import { TypoProps } from '@/utils/types'
 
 const Typo = ({ children, className }: TypoProps) => {
   return (
-    <View className='bg-red-400'>
+    <View className=''>
       <Text className={className}>{children}</Text>
     </View>
   )
