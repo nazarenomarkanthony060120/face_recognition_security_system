@@ -9,7 +9,7 @@ const AddStudentFormHeader = () => {
         Add your Student
       </Typo>
       <Typo className="text-lg text-cyan-500 font-bold text-center">
-        Complete your registration
+        Fill up the form
       </Typo>
     </SafeAreaView>
   )

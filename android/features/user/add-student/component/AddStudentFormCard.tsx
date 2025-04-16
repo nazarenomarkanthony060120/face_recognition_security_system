@@ -12,7 +12,7 @@ interface AddStudentFormCardProps {
 
 const AddStudentFormCard = ({ control }: AddStudentFormCardProps) => {
   return (
-    <ScrollView showsVerticalScrollIndicator={false}>
+    <ScrollView showsVerticalScrollIndicator={false} className="mt-16">
       <SafeAreaView className="gap-2 p-5">
         <AddStudentFormHeader />
         <AddStudentFormContents control={control} />

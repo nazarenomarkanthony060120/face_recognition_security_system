@@ -1,6 +1,5 @@
-import React, { createContext, useState, useEffect } from 'react'
-import { onAuthStateChanged, User } from 'firebase/auth'
-import { auth } from '@/lib/firestore'
+import React, { createContext, useState, useEffect, useContext } from 'react'
+import { auth, onAuthStateChanged, User } from '@/lib/firestore'
 
 type ContextProps = {
   user: User | null
@@ -8,18 +7,18 @@ type ContextProps = {
 
 const AuthContext = createContext<Partial<ContextProps>>({})
 
-interface Props {
+interface AuthProviderProps {
   children: React.ReactNode
 }
 
-const AuthProvider = ({ children }: Props) => {
+export function AuthProvider({ children }: AuthProviderProps) {
   const [user, setUser] = useState<User | null>(null)
-
   useEffect(() => {
+    if (!auth) return
+
     const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
       setUser(firebaseUser)
     })
-
     return () => unsubscribe()
   }, [])
 
@@ -28,4 +27,4 @@ const AuthProvider = ({ children }: Props) => {
   )
 }
 
-export { AuthContext, AuthProvider }
+export const useAuth = () => useContext(AuthContext)

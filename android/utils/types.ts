@@ -85,3 +85,10 @@ export type LoginRequest = {
   email: string
   password: string
 }
+
+export type AddStudent = {
+  userId: string
+  studentId: string
+  name: string
+  gradeSection: string
+}
