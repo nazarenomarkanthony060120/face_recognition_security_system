@@ -22,7 +22,7 @@ const LoginController = () => {
     login(data as LoginRequest, {
       onSuccess: (data) => {
         const route = getUserRoutes(data?.type)
-        router.replace(route)
+        router.replace()
       },
     })
   }
