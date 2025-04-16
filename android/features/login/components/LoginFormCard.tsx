@@ -9,6 +9,7 @@ import LoginFormContents from './LoginFormContents'
 import LoginFormFooter from './LoginFormFooter'
 import { ScrollView } from 'react-native'
 import Typo from '@/components/typo'
+import { getUserRoutes } from '@/features/common/part/getUserRoutes'
 
 const LoginController = () => {
   const { control, handleSubmit } = useForm()
@@ -19,8 +20,9 @@ const LoginController = () => {
 
   const onSubmit: SubmitHandler<FieldValues> = (data) => {
     login(data as LoginRequest, {
-      onSuccess: () => {
-        router.replace('/screens/(user)/dashboard')
+      onSuccess: (data) => {
+        const route = getUserRoutes(data?.type)
+        router.replace(route)
       },
     })
   }
