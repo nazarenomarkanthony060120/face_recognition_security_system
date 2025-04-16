@@ -7,12 +7,21 @@ import { getUserStatus } from '../../common/components/getUserStatus'
 interface DashboardListsProps {
   parent: ParentType
 }
+
 const DashboardLists = ({ parent }: DashboardListsProps) => {
   const router = useRouter()
+
+  const navigateToViewParent = () => {
+    router.replace({
+      pathname: '/screens/(admin)/viewParent/viewParent',
+      params: { id: parent.id },
+    })
+  }
+
   return (
     <Pressable
       className="p-4 m-2 bg-white rounded-lg shadow"
-      onPress={() => router.replace('/screens/(admin)/addParent')}
+      onPress={navigateToViewParent}
     >
       <Text className="text-lg font-bold">{parent.name}</Text>
       <Text className="text-sm text-gray-600">{parent.email}</Text>
