@@ -8,6 +8,6 @@ export const loginUser = async (data: LoginRequest) => {
     data.email,
     data.password,
   )
-  const type = await fetchUserById({ id: userCredential.user.uid })
-  return type
+  // const type = await fetchUserById({ id: userCredential.user.uid })
+  return userCredential.user.uid
 }
