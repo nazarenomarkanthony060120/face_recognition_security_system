@@ -47,6 +47,7 @@ const AddStudent = () => {
       />
       {showCountdown && (
         <CountDown
+          setShowCountdown={setShowCountdown}
           time={5}
           route={'/screens/(seller)/dashboard/store'}
           message="You will be redirected to your store in"
