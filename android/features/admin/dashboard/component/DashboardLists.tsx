@@ -12,7 +12,7 @@ const DashboardLists = ({ parent }: DashboardListsProps) => {
   const router = useRouter()
 
   const navigateToViewParent = () => {
-    router.replace({
+    router.push({
       pathname: '/screens/(admin)/viewParent/viewParent',
       params: { id: parent.id },
     })
