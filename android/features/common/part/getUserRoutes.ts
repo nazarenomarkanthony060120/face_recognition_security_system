@@ -10,6 +10,6 @@ export const getUserRoutes = (type: UserType) => {
       return '/screens/(user)/dashboard'
 
     default:
-      return '/screens/admin/dashboard'
+      return '/screens/(admin)/dashboard'
   }
 }

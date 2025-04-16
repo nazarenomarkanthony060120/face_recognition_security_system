@@ -18,9 +18,12 @@ const LoginController = () => {
 
   const onSubmit: SubmitHandler<FieldValues> = (data) => {
     login(data as LoginRequest, {
-      onSuccess: (data) => {
-        const route = getUserRoutes(data?.type)
-        router.replace(route)
+      onSuccess: () => {
+        // const route = getUserRoutes(data?.type)
+        router.replace('/screens/(admin)/dashboard')
+      },
+      onError: (error) => {
+        console.log('Login error:', error.stack)
       },
     })
   }
@@ -37,7 +40,7 @@ const LoginController = () => {
         />
 
         <Typo>
-          {error && <Typo className="text-red">{error.message}</Typo>}
+          {error && <Typo className="text-red-500">{error.message}</Typo>}
         </Typo>
       </SafeAreaView>
     </ScrollView>
