@@ -1,11 +1,11 @@
 {
   "expo": {
     "name": "Face Recognition Security System",
-    "slug": "Face Recognition Security System",
+    "slug": "Face_Recognition_Security_System",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "Face Recognition Security System",
+    "scheme": "Face_Recognition_Security_System",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {

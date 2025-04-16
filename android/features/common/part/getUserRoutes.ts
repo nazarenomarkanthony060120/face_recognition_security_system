@@ -1,4 +1,3 @@
-import { useAuth } from '@/context/auth'
 import { UserType } from '@/utils/types'
 
 type getUserRoutes = {
@@ -11,6 +10,6 @@ export const getUserRoutes = (type: UserType) => {
       return '/screens/(user)/dashboard'
 
     default:
-      return '/screens/(admin)/dashboard'
+      return '/screens/admin/dashboard'
   }
 }
