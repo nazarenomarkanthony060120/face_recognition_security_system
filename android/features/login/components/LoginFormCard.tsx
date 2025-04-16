@@ -19,8 +19,7 @@ const LoginController = () => {
   const onSubmit: SubmitHandler<FieldValues> = (data) => {
     login(data as LoginRequest, {
       onSuccess: () => {
-        // const route = getUserRoutes(data?.type)
-        router.replace('/screens/(admin)/dashboard')
+        router.replace('/screens/(admin)/dashboard/dashboard')
       },
       onError: (error) => {
         console.log('Login error:', error.stack)
