@@ -7,9 +7,15 @@ export type LoginRequest = {
   password: string
 }
 
-export enum UserStatus {
+export enum UserStatusDB {
   ACTIVE = 1,
   INACTIVE = 0,
+}
+
+export enum UserStatusValue {
+  ACTIVE = 'Active',
+  INACTIVE = 'Inactive',
+  UNKNOWN = 'Unknown',
 }
 
 export enum UserType {
@@ -22,4 +28,15 @@ export type RegisterParentType = {
   email: string
   password: string
   confirmPassword: string
+}
+
+export type ParentType = {
+  id: string
+  name: string
+  email: string
+  password: string
+  status: UserStatusValue
+  type: UserType
+  createdAt: string
+  updatedAt: string
 }

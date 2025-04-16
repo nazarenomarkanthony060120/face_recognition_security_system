@@ -6,7 +6,7 @@ import {
   setDoc,
   serverTimestamp,
 } from '@/lib/firestore'
-import { RegisterParentType, UserStatus, UserType } from '@/utils/types'
+import { RegisterParentType, UserStatusDB, UserType } from '@/utils/types'
 
 export const registerParent = async (data: RegisterParentType) => {
   const userCredential = await createUserWithEmailAndPassword(
@@ -20,7 +20,7 @@ export const registerParent = async (data: RegisterParentType) => {
     name: data.parentName,
     email: data.email,
     password: data.password,
-    status: UserStatus.ACTIVE,
+    status: UserStatusDB.ACTIVE,
     type: UserType.USER,
     createdAt: serverTimestamp(),
     updatedAt: serverTimestamp(),
