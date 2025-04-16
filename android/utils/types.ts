@@ -15,6 +15,10 @@ import {
   ViewStyle,
 } from 'react-native'
 
+export type UserIdRequest = {
+  id: string | undefined
+}
+
 export type ScreenWrapperProps = {
   style?: ViewStyle
   children: React.ReactNode
@@ -84,4 +88,9 @@ export type ResponseType = {
 export type LoginRequest = {
   email: string
   password: string
+}
+
+export enum UserType {
+  USER = 'User',
+  ADMIN = 'Admin',
 }

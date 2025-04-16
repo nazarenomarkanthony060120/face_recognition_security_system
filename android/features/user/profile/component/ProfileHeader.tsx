@@ -1,11 +1,11 @@
 import React from 'react'
-import { SafeAreaView } from 'react-native-safe-area-context'
-import { Ionicons } from '@expo/vector-icons'
 import { useRouter } from 'expo-router'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import Button from '@/components/button'
+import { Ionicons } from '@expo/vector-icons'
 import Typo from '@/components/typo'
 
-const AddStudentHeader = () => {
+const ProfileHeader = () => {
   const router = useRouter()
 
   const navigateToDashboard = () => {
@@ -32,4 +32,4 @@ const AddStudentHeader = () => {
   )
 }
 
-export default AddStudentHeader
+export default ProfileHeader

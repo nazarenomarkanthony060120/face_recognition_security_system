@@ -3,9 +3,17 @@ import {
   getAuth,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
-  signOut,
+  onAuthStateChanged,
+  User,
 } from 'firebase/auth'
-import { getFirestore } from 'firebase/firestore'
+import {
+  getFirestore,
+  setDoc,
+  doc,
+  getDoc,
+  serverTimestamp,
+  FieldValue,
+} from 'firebase/firestore'
 
 const firebaseConfig = {
   apiKey: process.env.EXPO_PUBLIC_API_KEY,
@@ -27,5 +35,11 @@ export {
   db,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
-  signOut,
+  setDoc,
+  doc,
+  getDoc,
+  serverTimestamp,
+  onAuthStateChanged,
+  User,
+  FieldValue,
 }
