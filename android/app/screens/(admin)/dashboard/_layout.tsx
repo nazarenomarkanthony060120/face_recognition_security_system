@@ -10,6 +10,7 @@ const _layout = () => {
     >
       <Tabs.Screen name="dashboard" options={{ title: 'Home' }} />
       <Tabs.Screen name="addParent" options={{ title: 'Add Parent' }} />
+      <Tabs.Screen name="profile" options={{ title: 'Profile' }} />
     </Tabs>
   )
 }
