@@ -12,7 +12,7 @@ const index = () => {
   const router = useRouter()
 
   const navigateToLogin = () => {
-    router.replace('/(auth)/login')
+    router.push('/(auth)/login')
   }
 
   return (

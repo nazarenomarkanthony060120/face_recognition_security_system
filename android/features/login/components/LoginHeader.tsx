@@ -9,7 +9,7 @@ const LoginHeader = () => {
   const router = useRouter()
 
   const navigateToBack = () => {
-    router.replace('/')
+    router.push('/')
   }
 
   return (
