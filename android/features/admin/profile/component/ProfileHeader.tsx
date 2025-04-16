@@ -9,7 +9,7 @@ const ProfileHeader = () => {
   const router = useRouter()
 
   const navigateToDashboard = () => {
-    router.push('/screens/(user)/dashboard')
+    router.push('/screens/(admin)/dashboard/dashboard')
   }
 
   return (
@@ -26,7 +26,7 @@ const ProfileHeader = () => {
           />
         }
       >
-        <Typo className="text-white">Back</Typo>
+        <Typo>Back</Typo>
       </Button>
     </SafeAreaView>
   )
