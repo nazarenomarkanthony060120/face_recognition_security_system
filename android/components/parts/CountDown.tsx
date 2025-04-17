@@ -22,7 +22,7 @@ const CountDown = ({
 
     if (countdown === 0) {
       setShowCountdown(false)
-      router.replace(route)
+      router.push(route)
     } else {
       const timer = setTimeout(() => {
         setCountdown((prev) => prev - 1)
@@ -33,7 +33,7 @@ const CountDown = ({
   }, [countdown])
   return (
     <View className="items-center pt-5">
-      <Text className="text-xl text-emerald-200">
+      <Text className="text-lg text-emerald-200">
         {message} - {countdown}
       </Text>
     </View>

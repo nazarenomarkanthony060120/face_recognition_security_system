@@ -13,7 +13,7 @@ const AddStudentFormContents = ({ control }: AddStudentFormContentsProps) => {
     <View className="gap-2 pt-11">
       <Controller
         control={control}
-        name="id"
+        name="studentId"
         rules={{
           required: 'Student Id is required',
           minLength: {

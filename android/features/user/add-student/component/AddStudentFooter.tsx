@@ -1,14 +1,14 @@
 import React from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import Button from '@/components/button'
 import Typo from '@/components/typo'
 
 const AddStudentFooter = () => {
   return (
-    <SafeAreaView className="gap-3 mb-20">
-      <Button className="bg-cyan-400 items-center rounded-3xl p-5">
-        <Typo className="text-white">Add Student</Typo>
-      </Button>
+    <SafeAreaView className=" mb-16">
+      <Typo className="text-slate-200 text-sm">All right reserved @2025</Typo>
+      <Typo className="text-slate-200 text-sm">
+        Face Recognition Security System
+      </Typo>
     </SafeAreaView>
   )
 }
