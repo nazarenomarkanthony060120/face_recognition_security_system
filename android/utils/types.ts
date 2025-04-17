@@ -1,5 +1,7 @@
+import { FieldValue } from "firebase/firestore"
+
 export type UserIdRequest = {
-  id: string | undefined
+  id: string | undefined | null
 }
 
 export type LoginRequest = {
@@ -37,8 +39,8 @@ export type ParentType = {
   password: string
   status: UserStatusValue
   type: UserType
-  createdAt: string
-  updatedAt: string
+  createdAt: FieldValue
+  updatedAt: FieldValue
 }
 
 export type User = {
@@ -46,8 +48,16 @@ export type User = {
   type: UserType
   name: string
   status: UserStatusDB
-  createdAt: string
-  updatedAt: string
+  createdAt: FieldValue
+  updatedAt: FieldValue
   email: string
   password: string
+}
+
+export type Student = {
+  id: string
+  name: string
+  gradeSection: string
+  createdAt: FieldValue
+  updatedAt: FieldValue
 }
