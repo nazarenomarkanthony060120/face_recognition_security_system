@@ -2,9 +2,9 @@ import { Text, Pressable, View } from 'react-native'
 import React from 'react'
 import { useRouter } from 'expo-router'
 import { ParentType, UserStatusValue } from '@/utils/types'
-import { getUserStatus } from '../../common/components/getUserStatus'
-import ImageWrapper from '@/components/parts/Image'
 import { PERSON_BLACK_ICON } from '@/constants/image'
+import { getUserStatus } from '@/features/common/part/getUserStatus'
+import ImageWrapper from '@/components/parts/Image'
 
 interface DashboardListsProps {
   parent: ParentType
