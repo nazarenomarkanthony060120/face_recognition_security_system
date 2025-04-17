@@ -18,7 +18,7 @@ const ProfileFormContents = ({ user }: ProfileFormContentsProps) => {
       <View className="items-center">
         <Text className="text-2xl font-bold">{item.name}</Text>
       </View>
-      <View className="mt-5 gap-5">
+      <View className="mt-5 gap-3">
         <Input
           className={'w-full py-3'}
           placeholder={'Parent Name'}

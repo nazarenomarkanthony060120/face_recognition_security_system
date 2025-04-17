@@ -20,7 +20,7 @@ const AddParentFormCard = () => {
     getValues,
   } = useForm()
 
-  const { mutate: register, error, isPending } = useAminParentRegister()
+  const { mutate: register, isPending } = useAminParentRegister()
 
   const onSubmit: SubmitHandler<FieldValues> = (data) => {
     register(data as RegisterParentType, {
@@ -39,7 +39,7 @@ const AddParentFormCard = () => {
           <CountDown
             time={5}
             route={'/screens/(admin)/dashboard'}
-            message="You will be redirected to Login in"
+            message="You will be redirected to Dashboard in"
             setShowCountdown={setShowCountdown}
           />
         )}
