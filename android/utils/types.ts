@@ -56,8 +56,17 @@ export type User = {
 
 export type Student = {
   id: string
+  studentId: string
+  parentId: string
   name: string
   gradeSection: string
   createdAt: FieldValue
   updatedAt: FieldValue
+}
+
+export type AddStudent = {
+  id: string
+  studentId: string
+  name: string
+  gradeSection: string
 }

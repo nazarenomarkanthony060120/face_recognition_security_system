@@ -5,7 +5,7 @@ import AddParentFormContents from './AddParentFormContents'
 import AddParentFormHeader from './AddParentFormHeader'
 import AddParentFormFooter from './AddParentFormFooter'
 import { FieldValues, SubmitHandler, useForm } from 'react-hook-form'
-import { useAminParentRegister } from '@/hooks/admin/useAdminParentRegister'
+import { useAdminParentRegister } from '@/hooks/admin/useAdminParentRegister'
 import { RegisterParentType } from '@/utils/types'
 import CountDown from '@/components/parts/CountDown'
 import Error from '@/components/parts/Error'
@@ -20,7 +20,7 @@ const AddParentFormCard = () => {
     getValues,
   } = useForm()
 
-  const { mutate: register, isPending } = useAminParentRegister()
+  const { mutate: register, isPending } = useAdminParentRegister()
 
   const onSubmit: SubmitHandler<FieldValues> = (data) => {
     register(data as RegisterParentType, {

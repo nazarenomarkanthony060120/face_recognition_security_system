@@ -1,5 +1,5 @@
 import { db, doc, getDoc } from '@/lib/firestore'
-import { User, UserIdRequest } from '@/utils/types'
+import { UserIdRequest } from '@/utils/types'
 
 export const fetchUserById = async ({ id }: UserIdRequest) => {
   if (!id) throw new Error('User ID is required')
@@ -15,7 +15,7 @@ export const fetchUserById = async ({ id }: UserIdRequest) => {
       email: docSnap.data().email,
       createdAt: docSnap.data().createdAt,
       updatedAt: docSnap.data().updatedAt,
-    } as User
+    }
   }
   return undefined
 }

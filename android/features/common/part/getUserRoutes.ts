@@ -8,8 +8,9 @@ export const getUserRoutes = (type: UserType) => {
   switch (type) {
     case UserType.USER:
       return '/screens/(user)/dashboard'
-
+    case UserType.ADMIN:
+      return '/screens/(admin)/dashboard/dashboard'
     default:
-      return '/screens/(admin)/dashboard'
+      return '/screens/(user)/dashboard'
   }
 }
