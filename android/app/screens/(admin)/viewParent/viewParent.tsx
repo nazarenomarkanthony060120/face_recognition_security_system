@@ -1,14 +1,10 @@
-import { View, Text } from 'react-native'
 import React from 'react'
-import { useLocalSearchParams } from 'expo-router'
+import ViewParent from '@/features/admin/viewParent/ViewParent'
+import { useSearchParams } from 'expo-router/build/hooks'
 
 const viewParent = () => {
-  const { id } = useLocalSearchParams()
-  return (
-    <View>
-      <Text>{id} ohyeah</Text>
-    </View>
-  )
+  const param = useSearchParams()
+  return <ViewParent params={param} />
 }
 
 export default viewParent
