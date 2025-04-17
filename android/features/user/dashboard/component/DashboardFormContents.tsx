@@ -2,7 +2,7 @@ import { ActivityIndicator, View } from 'react-native'
 import React from 'react'
 import { useAuth } from '@/context/auth'
 import { FlashList } from '@shopify/flash-list'
-import { useFetchAllStudents } from '@/hooks/common/fetchStudentById'
+import { useFetchAllStudents } from '@/hooks/common/fetchStudentsById'
 import ViewLists from '@/features/common/components/viewLists/ViewLists'
 
 const DashboardFormContents = () => {

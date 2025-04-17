@@ -1,12 +1,10 @@
-import { useQuery } from '@tanstack/react-query'
-import { Student, UserIdRequest } from '@/utils/types'
-import { fetchAllStudents } from '@/api/common/fetchStudentById'
+import { fetchStudentById } from "@/api/common/fetchStudentById"
+import { Student, UserIdRequest } from "@/utils/types"
+import { useQuery } from "@tanstack/react-query"
 
-export const useFetchAllStudents = ({ id }: UserIdRequest) => {
-  return useQuery<Student[]>({
-    queryKey: ['students', id],
-    queryFn: () => fetchAllStudents({ id }),
-    refetchInterval: 2000,
-    enabled: !!id,
+export const useFetchStudentById = ({ id }: UserIdRequest) => {
+  return useQuery<Student | null>({
+    queryKey: ['student', id],
+    queryFn: () => fetchStudentById({ id }),
   })
 }

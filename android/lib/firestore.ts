@@ -13,6 +13,10 @@ import {
   getDoc,
   serverTimestamp,
   FieldValue,
+  collection,
+  getDocs,
+  query,
+  where
 } from 'firebase/firestore'
 
 const firebaseConfig = {
@@ -42,4 +46,8 @@ export {
   onAuthStateChanged,
   User,
   FieldValue,
+  collection,
+  getDocs,
+  query,
+  where
 }

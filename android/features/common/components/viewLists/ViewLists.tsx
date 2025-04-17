@@ -13,7 +13,10 @@ const ViewLists = ({ student }: ViewListsProps) => {
   const router = useRouter()
 
   const navigateToMyStudent = () => {
-    router.push('/screens/(user)/myStudent/myStudent')
+    router.push({
+      pathname: '/screens/(user)/myStudent/myStudent',
+      params: { id: student.id },
+    })
   }
 
   return (

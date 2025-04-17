@@ -6,6 +6,5 @@ export const useFetchAllParents = () => {
   return useQuery<ParentType[]>({
     queryKey: ['parents'],
     queryFn: () => fetchAllParents(),
-    refetchInterval: 2000,
   })
 }
