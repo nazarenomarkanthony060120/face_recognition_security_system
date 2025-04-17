@@ -7,7 +7,7 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 const ViewParentFormHeader = () => {
   return (
     <SafeAreaView className="items-center justify-center relative">
-      <Typo className="text-3xl font-semibold text-slate-100 m-8">
+      <Typo className="text-3xl font-semibold text-slate-100 my-5">
         Parent Profile
       </Typo>
       <ImageWrapper

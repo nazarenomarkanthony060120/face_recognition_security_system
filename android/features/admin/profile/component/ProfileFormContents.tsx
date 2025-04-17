@@ -16,7 +16,7 @@ const ProfileFormContents = ({ user }: ProfileFormContentsProps) => {
   const renderUser = (item: User) => (
     <SafeAreaView className="flex-1 mt-4">
       <View className="items-center">
-        <Text className="text-2xl font-bold">{item.name}</Text>
+        <Text className="text-2xl text-slate-200 font-bold">{item.name}</Text>
       </View>
       <View className="mt-5 gap-3">
         <Input

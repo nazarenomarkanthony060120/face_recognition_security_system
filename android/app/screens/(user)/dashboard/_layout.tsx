@@ -1,8 +1,15 @@
 import React from 'react'
-import { Tabs } from 'expo-router'
+import { Tabs, useRouter } from 'expo-router'
 import { TabBar } from '@/components/parts/TabBar'
+import { useAuth } from '@/context/auth'
 
 const _layout = () => {
+  const router = useRouter()
+  const auth = useAuth()
+  if (!auth.user) {
+    router.replace('/(auth)/login')
+  }
+
   return (
     <Tabs
       tabBar={(props) => <TabBar {...props} />}
