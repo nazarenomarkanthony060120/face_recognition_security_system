@@ -26,7 +26,7 @@ const ViewParent = ({ params }: ViewParentProps) => {
   }
 
   return (
-    <Admin className="flex-1 bg-slate-800 justify-between p-5">{content}</Admin>
+    <Admin className="flex-1 bg-slate-800 justify-between">{content}</Admin>
   )
 }
 

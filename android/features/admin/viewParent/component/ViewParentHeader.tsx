@@ -13,7 +13,7 @@ const ViewParentHeader = () => {
   }
 
   return (
-    <SafeAreaView>
+    <SafeAreaView className="p-5">
       <Button
         className="w-44 flex-row items-center gap-3"
         onPress={navigateToDashboard}

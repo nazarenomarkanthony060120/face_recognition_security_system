@@ -10,7 +10,7 @@ interface ViewParentFormContentsProps {
 
 const ViewParentFormContents = ({ parent }: ViewParentFormContentsProps) => {
   const renderParent = (item: User) => (
-    <SafeAreaView className="flex-1 mt-4">
+    <SafeAreaView className="flex-1 mt-2">
       <View className="items-center">
         <Text className="text-2xl font-bold text-slate-200">{item.name}</Text>
       </View>

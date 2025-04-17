@@ -9,8 +9,8 @@ interface ViewStutdentsProps {
 const ViewStutdents = ({ id }: ViewStutdentsProps) => {
   const { data: studentsData, isLoading } = useFetchAllStudents({ id })
   return (
-    <View>
-      <Text>ViewStutdents</Text>
+    <View className="bg-slate-200 mt-5 p-3">
+      <Text className="text-center">View Stutdents</Text>
     </View>
   )
 }

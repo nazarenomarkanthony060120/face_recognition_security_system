@@ -26,7 +26,7 @@ const ProfileHeader = () => {
           />
         }
       >
-        <Typo>Back</Typo>
+        <Typo className="text-slate-200">Back</Typo>
       </Button>
     </SafeAreaView>
   )

@@ -7,7 +7,7 @@ import Typo from '@/components/typo'
 const ProfileFormHeader = () => {
   return (
     <SafeAreaView className="items-center justify-center relative">
-      <Typo className="text-3xl font-semibold text-slate-800 m-8">
+      <Typo className="text-3xl font-semibold text-slate-200 m-8">
         Personal Profile
       </Typo>
       <ImageWrapper

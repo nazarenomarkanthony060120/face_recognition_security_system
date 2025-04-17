@@ -12,7 +12,7 @@ const ProfileFooter = () => {
   const onSubmit = () => {
     logout(undefined, {
       onSuccess: () => {
-        router.push('/(auth)/login')
+        router.replace('/(auth)/login')
       },
       onError: (error) => {
         console.log(error.message)
