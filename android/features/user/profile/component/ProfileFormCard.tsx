@@ -3,13 +3,18 @@ import React from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import ProfileFormHeader from './ProfileFormHeader'
 import ProfileFormContents from './ProfileFormContents'
+import { User } from '@/utils/types'
 
-const ProfileFormCard = () => {
+interface ProfileFormCardProps {
+  user: User | undefined
+}
+
+const ProfileFormCard = ({ user }: ProfileFormCardProps) => {
   return (
     <ScrollView showsVerticalScrollIndicator={false}>
-      <SafeAreaView className="gap-2 p-5">
+      <SafeAreaView className="gap-2 mt-10">
         <ProfileFormHeader />
-        <ProfileFormContents />
+        <ProfileFormContents user={user} />
       </SafeAreaView>
     </ScrollView>
   )

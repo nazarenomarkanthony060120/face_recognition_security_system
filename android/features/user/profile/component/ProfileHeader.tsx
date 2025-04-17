@@ -9,7 +9,7 @@ const ProfileHeader = () => {
   const router = useRouter()
 
   const navigateToDashboard = () => {
-    router.push('/screens/(user)/dashboard')
+    router.push('/screens/(user)/dashboard/dashboard')
   }
 
   return (
