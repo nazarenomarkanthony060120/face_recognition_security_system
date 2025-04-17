@@ -1,6 +1,5 @@
 import React from 'react'
 import { useForm, SubmitHandler, FieldValues } from 'react-hook-form'
-import { useLogin } from '@/hooks/login'
 import { LoginRequest } from '@/utils/types'
 import LoginFormHeader from './LoginFormHeader'
 import { SafeAreaView } from 'react-native-safe-area-context'
@@ -8,8 +7,8 @@ import LoginFormContents from './LoginFormContents'
 import LoginFormFooter from './LoginFormFooter'
 import { ScrollView } from 'react-native'
 import Typo from '@/components/typo'
-import { getUserRoutes } from '@/features/common/part/getUserRoutes'
 import { useRouter } from 'expo-router'
+import { useLogin } from '@/hooks/login'
 
 const LoginController = () => {
   const { control, handleSubmit } = useForm()

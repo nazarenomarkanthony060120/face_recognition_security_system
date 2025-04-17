@@ -40,3 +40,14 @@ export type ParentType = {
   createdAt: string
   updatedAt: string
 }
+
+export type User = {
+  id: string
+  type: UserType
+  name: string
+  status: UserStatusDB
+  createdAt: string
+  updatedAt: string
+  email: string
+  password: string
+}
