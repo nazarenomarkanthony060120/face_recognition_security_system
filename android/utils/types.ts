@@ -51,7 +51,6 @@ export type User = {
   createdAt: FieldValue
   updatedAt: FieldValue
   email: string
-  password: string
 }
 
 export type Student = {

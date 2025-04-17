@@ -1,16 +1,14 @@
-import { doc, getDoc, query, collection, where, getDocs } from 'firebase/firestore'
 import { db } from '@/lib/firestore'
+import { collection, getDocs, query, where } from 'firebase/firestore'
 import { Student, UserIdRequest } from '@/utils/types'
-import { documentId } from 'firebase/firestore' // 🔑 import this!
 
-export const fetchStudentById = async ({ id }: UserIdRequest) => {
+export const fetchAllStudents = async ({ id }: UserIdRequest) => {
 
-  const q = query(collection(db, 'students'), where(documentId(), '==', id))
+  const q = query(collection(db, 'students'), where('parentId', '==', id))
   const querySnapshot = await getDocs(q)
 
   if (!querySnapshot.empty) {
-    const docSnap = querySnapshot.docs[0]
-    return {
+    return querySnapshot.docs.map((docSnap) => ({
       id: docSnap.id,
       studentId: docSnap.data().studentId,
       parentId: docSnap.data().parentId,
@@ -18,8 +16,8 @@ export const fetchStudentById = async ({ id }: UserIdRequest) => {
       gradeSection: docSnap.data().gradeSection,
       createdAt: docSnap.data().createdAt,
       updatedAt: docSnap.data().updatedAt,
-    } as Student
+    })) as Student[]
   }
 
-  return null
+  return []
 }

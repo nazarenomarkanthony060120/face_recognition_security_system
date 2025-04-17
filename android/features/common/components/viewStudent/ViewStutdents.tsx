@@ -1,6 +1,6 @@
 import { View, Text } from 'react-native'
 import React from 'react'
-import { useFetchAllStudents } from '@/hooks/common/fetchStudentById'
+import { useFetchAllStudents } from '@/hooks/common/fetchStudentsById'
 
 interface ViewStutdentsProps {
   id: string | undefined
