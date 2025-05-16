@@ -1,5 +1,6 @@
 import { db, doc, setDoc, getDoc, serverTimestamp } from '@/lib/firestore'
 import { collection, query, where, getDocs, deleteDoc } from 'firebase/firestore'
+import { sendSMS } from './twilio'
 
 interface SendOTPRequest {
   phoneNumber: string
@@ -40,9 +41,9 @@ export const sendOTP = async ({ phoneNumber }: SendOTPRequest) => {
     // Store OTP in Firestore
     await storeOTP(phoneNumber, otp)
 
-    // TODO: Integrate with your SMS service provider here
-    // For development, we'll just log the OTP
-    console.log(`OTP for ${phoneNumber}: ${otp}`)
+    // Send OTP via Twilio SMS
+    const message = `Your OTP for Face Recognition Security System is: ${otp}. This code will expire in 5 minutes.`
+    await sendSMS(phoneNumber, message)
 
     return { success: true }
   } catch (error) {
