@@ -7,7 +7,14 @@ import {
   UseFormGetValues,
 } from 'react-hook-form'
 import Input from '@/components/input'
-import { FontAwesome5, MaterialIcons } from '@expo/vector-icons'
+import {
+  AntDesign,
+  Entypo,
+  EvilIcons,
+  FontAwesome5,
+  MaterialIcons,
+} from '@expo/vector-icons'
+import { Feather } from 'lucide-react-native'
 
 interface AddParentFormContentsProps {
   control: Control<FieldValues>
@@ -44,8 +51,58 @@ const AddParentFormContents = ({
       />
       <Controller
         control={control}
+        name="phoneNumber"
+        rules={{
+          required: 'Phone Number is required',
+          minLength: {
+            value: 11,
+            message: 'Phone Number must be at least 11 characters',
+          },
+        }}
+        render={({ field: { onChange, value } }) => (
+          <Input
+            className={'w-full py-3  placeholder:text-slate-400 '}
+            placeholder={'Phone Number'}
+            value={value}
+            onChangeText={onChange}
+            secureTextEntry={false}
+            isIconLeft
+            icon={<AntDesign name={'phone'} size={20} color="#00bdcf" />}
+          />
+        )}
+      />
+      <Controller
+        control={control}
+        name="address"
+        rules={{
+          required: 'Address is required',
+          minLength: {
+            value: 5,
+            message: 'Address must be at least 5 characters',
+          },
+        }}
+        render={({ field: { onChange, value } }) => (
+          <Input
+            className={'w-full py-3  placeholder:text-slate-400 '}
+            placeholder={'Address'}
+            value={value}
+            onChangeText={onChange}
+            secureTextEntry={false}
+            isIconLeft
+            icon={<Entypo name={'location-pin'} size={20} color="#00bdcf" />}
+          />
+        )}
+      />
+      <Controller
+        control={control}
         name="email"
-        rules={{ required: 'Email Address is required' }}
+        rules={{
+          required: 'Email is required',
+          pattern: {
+            value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+            message: 'Email Address is not valid',
+          },
+        }}
         render={({ field: { onChange, value } }) => (
           <Input
             className={'w-full py-3  placeholder:text-slate-400 '}
@@ -70,8 +127,8 @@ const AddParentFormContents = ({
         rules={{
           required: 'Password is required',
           minLength: {
-            value: 6,
-            message: 'Password must be at least 6 characters',
+            value: 8,
+            message: 'Password must be at least 8 characters',
           },
         }}
         render={({ field: { onChange, value } }) => (

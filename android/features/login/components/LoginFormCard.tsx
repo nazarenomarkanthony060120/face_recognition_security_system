@@ -9,7 +9,6 @@ import { ScrollView } from 'react-native'
 import Typo from '@/components/typo'
 import { useRouter } from 'expo-router'
 import { useLogin } from '@/hooks/login'
-import { getUserRoutes } from '@/features/common/part/getUserRoutes'
 
 const LoginController = () => {
   const { control, handleSubmit } = useForm()
@@ -19,8 +18,11 @@ const LoginController = () => {
   const onSubmit: SubmitHandler<FieldValues> = (data) => {
     login(data as LoginRequest, {
       onSuccess: (data) => {
-        const route = getUserRoutes(data?.type)
-        router.push(route)
+        console.log('Login success:', data)
+        router.push({
+          pathname: '/(auth)/loginAuthentication',
+          params: { type: data?.type, phoneNumber: data?.phoneNumber },
+        })
       },
       onError: (error) => {
         console.log('Login error:', error.stack)

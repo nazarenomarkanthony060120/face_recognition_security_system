@@ -9,7 +9,7 @@ const AddParentHeader = () => {
   const router = useRouter()
 
   const navigateToMyStore = () => {
-    router.replace('/screens/(admin)/dashboard')
+    router.replace('/screens/(admin)/dashboard/dashboard')
   }
 
   return (

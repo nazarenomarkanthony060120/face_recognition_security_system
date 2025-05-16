@@ -45,6 +45,8 @@ export type ParentType = {
 
 export type User = {
   id: string
+  phoneNumber: string
+  address: string
   type: UserType
   name: string
   status: UserStatusDB

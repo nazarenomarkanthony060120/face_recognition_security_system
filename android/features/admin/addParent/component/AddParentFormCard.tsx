@@ -32,26 +32,24 @@ const AddParentFormCard = () => {
   }
 
   return (
-    <ScrollView showsVerticalScrollIndicator={false}>
-      <SafeAreaView className="gap-2 p-5">
-        <AddParentFormHeader />
-        {showCountdown && (
-          <CountDown
-            time={5}
-            route={'/screens/(admin)/dashboard'}
-            message="You will be redirected to Dashboard in"
-            setShowCountdown={setShowCountdown}
-          />
-        )}
-        <AddParentFormContents control={control} getValues={getValues} />
-        <AddParentFormFooter
-          handleSubmit={handleSubmit}
-          onSubmit={onSubmit}
-          isPending={isPending}
+    <SafeAreaView className="gap-2 p-5">
+      <AddParentFormHeader />
+      {showCountdown && (
+        <CountDown
+          time={5}
+          route={'/screens/(admin)/dashboard'}
+          message="You will be redirected to Dashboard in"
+          setShowCountdown={setShowCountdown}
         />
-      </SafeAreaView>
+      )}
+      <AddParentFormContents control={control} getValues={getValues} />
+      <AddParentFormFooter
+        handleSubmit={handleSubmit}
+        onSubmit={onSubmit}
+        isPending={isPending}
+      />
       {Object.keys(errors).length > 0 && <Error errors={errors} />}
-    </ScrollView>
+    </SafeAreaView>
   )
 }
 
