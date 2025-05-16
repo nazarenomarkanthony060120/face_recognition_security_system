@@ -5,7 +5,6 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import { MaterialIcons } from '@expo/vector-icons'
 import { getUserRoutes } from '@/features/common/part/getUserRoutes'
 import { UserType } from '@/utils/types'
-import { sendOTP, verifyOTP } from '@/api/otp'
 
 interface LoginAuthenticationProps {
   params: URLSearchParams
@@ -15,7 +14,6 @@ const LoginAuthentication = ({ params }: LoginAuthenticationProps) => {
   const [otp, setOtp] = useState('')
   const [timer, setTimer] = useState(60)
   const [canResend, setCanResend] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
   const phoneNumber = params.get('phoneNumber')
   const type = params.get('type') as UserType
@@ -34,25 +32,19 @@ const LoginAuthentication = ({ params }: LoginAuthenticationProps) => {
     }, 1000)
 
     // Send OTP when component mounts
-    handleSendOTP()
+    sendOTP()
 
     return () => clearInterval(interval)
   }, [])
 
-  const handleSendOTP = async () => {
-    if (!phoneNumber) {
-      Alert.alert('Error', 'Phone number is required')
-      return
-    }
-
+  const sendOTP = async () => {
     try {
-      setIsLoading(true)
-      await sendOTP({ phoneNumber })
+      // TODO: Implement your SMS sending logic here
+      // This is where you would integrate with your SMS service provider
+      console.log(`Sending OTP to ${phoneNumber}`)
       Alert.alert('Success', 'OTP has been sent to your phone number')
     } catch (error) {
       Alert.alert('Error', 'Failed to send OTP. Please try again.')
-    } finally {
-      setIsLoading(false)
     }
   }
 
@@ -60,36 +52,26 @@ const LoginAuthentication = ({ params }: LoginAuthenticationProps) => {
     if (canResend) {
       setTimer(60)
       setCanResend(false)
-      handleSendOTP()
+      sendOTP()
     }
   }
 
   const handleVerifyOTP = async () => {
-    if (!phoneNumber) {
-      Alert.alert('Error', 'Phone number is required')
-      return
-    }
-
     if (otp.length !== 6) {
       Alert.alert('Error', 'Please enter a valid 6-digit OTP')
       return
     }
 
     try {
-      setIsLoading(true)
-      await verifyOTP({ phoneNumber, otp })
+      // TODO: Implement your OTP verification logic here
+      // This is where you would verify the OTP with your backend
+      console.log('Verifying OTP:', otp)
 
       // If verification is successful, navigate to the appropriate screen based on user type
       const route = getUserRoutes(type)
       router.push(route)
     } catch (error) {
-      if (error instanceof Error) {
-        Alert.alert('Error', error.message)
-      } else {
-        Alert.alert('Error', 'Invalid OTP. Please try again.')
-      }
-    } finally {
-      setIsLoading(false)
+      Alert.alert('Error', 'Invalid OTP. Please try again.')
     }
   }
 
@@ -112,17 +94,15 @@ const LoginAuthentication = ({ params }: LoginAuthenticationProps) => {
             maxLength={6}
             value={otp}
             onChangeText={setOtp}
-            editable={!isLoading}
           />
         </View>
 
         <TouchableOpacity
-          className={`bg-[#00bdcf] p-4 rounded-lg mb-4 ${isLoading ? 'opacity-50' : ''}`}
+          className="bg-[#00bdcf] p-4 rounded-lg mb-4"
           onPress={handleVerifyOTP}
-          disabled={isLoading}
         >
           <Text className="text-white text-center font-bold text-lg">
-            {isLoading ? 'Verifying...' : 'Verify OTP'}
+            Verify OTP
           </Text>
         </TouchableOpacity>
 
@@ -132,12 +112,8 @@ const LoginAuthentication = ({ params }: LoginAuthenticationProps) => {
               Resend code in {timer} seconds
             </Text>
           ) : (
-            <TouchableOpacity onPress={handleResendOTP} disabled={isLoading}>
-              <Text
-                className={`text-[#00bdcf] font-bold ${isLoading ? 'opacity-50' : ''}`}
-              >
-                Resend OTP
-              </Text>
+            <TouchableOpacity onPress={handleResendOTP}>
+              <Text className="text-[#00bdcf] font-bold">Resend OTP</Text>
             </TouchableOpacity>
           )}
         </View>
