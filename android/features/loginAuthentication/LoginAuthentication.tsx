@@ -1,11 +1,24 @@
 import { View, Text, TextInput, TouchableOpacity, Alert } from 'react-native'
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'expo-router'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { MaterialIcons } from '@expo/vector-icons'
 import { getUserRoutes } from '@/features/common/part/getUserRoutes'
 import { UserType } from '@/utils/types'
 import { sendOTP, verifyOTP } from '@/api/otp'
+import * as Notifications from 'expo-notifications'
+import * as Device from 'expo-device'
+
+// Configure notification handler
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: true,
+    shouldSetBadge: false,
+    shouldShowBanner: true,
+    shouldShowList: true,
+  }),
+})
 
 interface LoginAuthenticationProps {
   params: URLSearchParams
@@ -19,11 +32,27 @@ const LoginAuthentication = ({ params }: LoginAuthenticationProps) => {
   const router = useRouter()
   const phoneNumber = params.get('phoneNumber')
   const type = params.get('type') as UserType
+  const notificationListener = useRef<Notifications.Subscription>()
+  const responseListener = useRef<Notifications.Subscription>()
 
   useEffect(() => {
+    // Request notification permissions
+    registerForPushNotificationsAsync()
+
+    // Set up notification listeners
+    notificationListener.current =
+      Notifications.addNotificationReceivedListener((notification) => {
+        console.log('Notification received:', notification)
+      })
+
+    responseListener.current =
+      Notifications.addNotificationResponseReceivedListener((response) => {
+        console.log('Notification response:', response)
+      })
+
     // Start the timer when component mounts
     const interval = setInterval(() => {
-      setTimer((prevTimer) => {
+      setTimer((prevTimer: number) => {
         if (prevTimer <= 1) {
           clearInterval(interval)
           setCanResend(true)
@@ -36,8 +65,44 @@ const LoginAuthentication = ({ params }: LoginAuthenticationProps) => {
     // Send OTP when component mounts
     handleSendOTP()
 
-    return () => clearInterval(interval)
+    return () => {
+      clearInterval(interval)
+      if (notificationListener.current) {
+        Notifications.removeNotificationSubscription(
+          notificationListener.current,
+        )
+      }
+      if (responseListener.current) {
+        Notifications.removeNotificationSubscription(responseListener.current)
+      }
+    }
   }, [])
+
+  const registerForPushNotificationsAsync = async () => {
+    if (Device.isDevice) {
+      const { status: existingStatus } =
+        await Notifications.getPermissionsAsync()
+      let finalStatus = existingStatus
+      if (existingStatus !== 'granted') {
+        const { status } = await Notifications.requestPermissionsAsync()
+        finalStatus = status
+      }
+      if (finalStatus !== 'granted') {
+        console.log('Failed to get push token for push notification!')
+        return
+      }
+    }
+  }
+
+  const sendLocalNotification = async (title: string, body: string) => {
+    await Notifications.scheduleNotificationAsync({
+      content: {
+        title,
+        body,
+      },
+      trigger: null, // null means show immediately
+    })
+  }
 
   const handleSendOTP = async () => {
     if (!phoneNumber) {
@@ -48,6 +113,10 @@ const LoginAuthentication = ({ params }: LoginAuthenticationProps) => {
     try {
       setIsLoading(true)
       await sendOTP({ phoneNumber })
+      await sendLocalNotification(
+        'OTP Sent',
+        `A verification code has been sent to ${phoneNumber}`,
+      )
       Alert.alert('Success', 'OTP has been sent to your phone number')
     } catch (error) {
       Alert.alert('Error', 'Failed to send OTP. Please try again.')
@@ -78,6 +147,12 @@ const LoginAuthentication = ({ params }: LoginAuthenticationProps) => {
     try {
       setIsLoading(true)
       await verifyOTP({ phoneNumber, otp })
+
+      // Send success notification
+      await sendLocalNotification(
+        'Verification Successful',
+        'Your phone number has been verified successfully!',
+      )
 
       // If verification is successful, navigate to the appropriate screen based on user type
       const route = getUserRoutes(type)
