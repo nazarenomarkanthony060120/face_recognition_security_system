@@ -25,6 +25,8 @@ npx expo install lottie-react-native
 npm install @lottiefiles/dotlottie-react
 npm install --save-dev prettier eslint eslint-config-prettier eslint-plugin-unused-imports
 
+#building
+eas build --platform android --profile production
 
 # Tips
 https://dev.to/iammtander/custom-fonts-in-react-native-pro-tip-4693

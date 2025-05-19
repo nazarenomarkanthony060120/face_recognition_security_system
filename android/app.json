@@ -16,7 +16,14 @@
         "foregroundImage": "./assets/images/icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.nazarenomarkanthony060120.Face_Recognition_Security_System"
+      "package": "com.nazarenomarkanthony060120.Face_Recognition_Security_System",
+      "versionCode": 1,
+      "permissions": [
+        "NOTIFICATIONS",
+        "CAMERA",
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE"
+      ]
     },
     "web": {
       "bundler": "metro",
@@ -33,6 +40,14 @@
           "resizeMode": "contain",
           "backgroundColor": "#ffffff"
         }
+      ],
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/images/icon.png",
+          "color": "#ffffff",
+          "sounds": ["./assets/sounds/notification.wav"]
+        }
       ]
     ],
     "experiments": {
@@ -45,6 +60,12 @@
       "eas": {
         "projectId": "d19eded2-e886-40f0-bcd9-b1f5f9966e35"
       }
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/d19eded2-e886-40f0-bcd9-b1f5f9966e35"
     }
   }
 }
