@@ -1,13 +1,16 @@
-import { View, Text, TextInput, TouchableOpacity, Alert } from 'react-native'
+import { View, Alert } from 'react-native'
 import React, { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'expo-router'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { MaterialIcons } from '@expo/vector-icons'
 import { getUserRoutes } from '@/features/common/part/getUserRoutes'
 import { UserType } from '@/utils/types'
 import { sendOTP, verifyOTP } from '@/api/otp'
 import * as Notifications from 'expo-notifications'
 import * as Device from 'expo-device'
+import { Header } from './components/Header'
+import { OTPInput } from './components/OTPInput'
+import { VerifyButton } from './components/VerifyButton'
+import { ResendOTP } from './components/ResendOTP'
 
 // Configure notification handler
 Notifications.setNotificationHandler({
@@ -112,13 +115,16 @@ const LoginAuthentication = ({ params }: LoginAuthenticationProps) => {
 
     try {
       setIsLoading(true)
-      await sendOTP({ phoneNumber })
+      const result = await sendOTP({ phoneNumber })
+      console.log('OTP sent result:', result)
+
       await sendLocalNotification(
         'OTP Sent',
         `A verification code has been sent to ${phoneNumber}`,
       )
       Alert.alert('Success', 'OTP has been sent to your phone number')
     } catch (error) {
+      console.error('Error sending OTP:', error)
       Alert.alert('Error', 'Failed to send OTP. Please try again.')
     } finally {
       setIsLoading(false)
@@ -139,14 +145,33 @@ const LoginAuthentication = ({ params }: LoginAuthenticationProps) => {
       return
     }
 
-    if (otp.length !== 6) {
+    const trimmedOTP = otp.trim()
+    console.log('OTP input details:', {
+      originalOTP: otp,
+      trimmedOTP,
+      originalLength: otp.length,
+      trimmedLength: trimmedOTP.length,
+      timestamp: new Date().toISOString(),
+    })
+
+    if (trimmedOTP.length !== 6) {
       Alert.alert('Error', 'Please enter a valid 6-digit OTP')
       return
     }
 
     try {
       setIsLoading(true)
-      await verifyOTP({ phoneNumber, otp })
+      console.log('Starting OTP verification process:', {
+        phoneNumber,
+        inputOTP: trimmedOTP,
+        inputOTPLength: trimmedOTP.length,
+        inputOTPType: typeof trimmedOTP,
+        inputOTPChars: trimmedOTP.split('').map((c: string) => c.charCodeAt(0)),
+        timestamp: new Date().toISOString(),
+      })
+
+      const result = await verifyOTP({ phoneNumber, otp: trimmedOTP })
+      console.log('OTP verification successful:', result)
 
       // Send success notification
       await sendLocalNotification(
@@ -158,10 +183,25 @@ const LoginAuthentication = ({ params }: LoginAuthenticationProps) => {
       const route = getUserRoutes(type)
       router.push(route)
     } catch (error) {
+      console.error('OTP verification error:', error)
+
+      let errorMessage = 'Failed to verify OTP. Please try again.'
       if (error instanceof Error) {
-        Alert.alert('Error', error.message)
-      } else {
-        Alert.alert('Error', 'Invalid OTP. Please try again.')
+        errorMessage = error.message
+        console.log('Detailed error:', {
+          message: error.message,
+          name: error.name,
+          stack: error.stack,
+          timestamp: new Date().toISOString(),
+        })
+      }
+
+      Alert.alert('Error', errorMessage)
+
+      // If the error is due to an expired OTP, allow resending
+      if (errorMessage.includes('expired')) {
+        setCanResend(true)
+        setTimer(0)
       }
     } finally {
       setIsLoading(false)
@@ -171,51 +211,20 @@ const LoginAuthentication = ({ params }: LoginAuthenticationProps) => {
   return (
     <SafeAreaView className="flex-1 bg-white">
       <View className="flex-1 p-4">
-        <View className="items-center mb-8">
-          <MaterialIcons name="verified-user" size={80} color="#00bdcf" />
-          <Text className="text-2xl font-bold mt-4">Verify Your Phone</Text>
-          <Text className="text-gray-600 mt-2">
-            Enter the 6-digit code sent to {phoneNumber}
-          </Text>
-        </View>
-
-        <View className="mb-6">
-          <TextInput
-            className="border border-gray-300 rounded-lg p-4 text-center text-xl"
-            placeholder="Enter OTP"
-            keyboardType="number-pad"
-            maxLength={6}
-            value={otp}
-            onChangeText={setOtp}
-            editable={!isLoading}
-          />
-        </View>
-
-        <TouchableOpacity
-          className={`bg-[#00bdcf] p-4 rounded-lg mb-4 ${isLoading ? 'opacity-50' : ''}`}
-          onPress={handleVerifyOTP}
-          disabled={isLoading}
-        >
-          <Text className="text-white text-center font-bold text-lg">
-            {isLoading ? 'Verifying...' : 'Verify OTP'}
-          </Text>
-        </TouchableOpacity>
-
-        <View className="items-center">
-          {timer > 0 ? (
-            <Text className="text-gray-600">
-              Resend code in {timer} seconds
-            </Text>
-          ) : (
-            <TouchableOpacity onPress={handleResendOTP} disabled={isLoading}>
-              <Text
-                className={`text-[#00bdcf] font-bold ${isLoading ? 'opacity-50' : ''}`}
-              >
-                Resend OTP
-              </Text>
-            </TouchableOpacity>
-          )}
-        </View>
+        <Header />
+        <OTPInput
+          otp={otp}
+          onChangeText={setOtp}
+          isLoading={isLoading}
+          phoneNumber={phoneNumber}
+        />
+        <VerifyButton onPress={handleVerifyOTP} isLoading={isLoading} />
+        <ResendOTP
+          timer={timer}
+          canResend={canResend}
+          onResend={handleResendOTP}
+          isLoading={isLoading}
+        />
       </View>
     </SafeAreaView>
   )
