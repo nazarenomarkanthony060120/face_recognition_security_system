@@ -17,6 +17,7 @@ interface ImageWrapperProps {
     | RecursiveArray<Falsy | ImageStyle | RegisteredStyle<ImageStyle>>
   resizeMode?: ImageResizeMode
   className?: string
+  onError?: (error: Error) => void
 }
 
 const ImageWrapper = ({
@@ -24,10 +25,16 @@ const ImageWrapper = ({
   style,
   resizeMode,
   className,
+  onError,
 }: ImageWrapperProps) => {
   return (
     <View className={className}>
-      <Image source={source} style={style} resizeMode={resizeMode} />
+      <Image
+        source={source}
+        style={style}
+        resizeMode={resizeMode}
+        onError={(e) => onError?.(new Error('Failed to load image'))}
+      />
     </View>
   )
 }
