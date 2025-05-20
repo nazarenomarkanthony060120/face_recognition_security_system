@@ -27,6 +27,7 @@ export enum UserType {
 
 export type RegisterParentType = {
   parentName: string
+  phoneNumber: string
   email: string
   password: string
   confirmPassword: string

@@ -18,6 +18,7 @@ export const registerParent = async (data: RegisterParentType) => {
 
   await setDoc(doc(db, 'users', user.uid), {
     name: data.parentName,
+    phoneNumber: data.phoneNumber,
     email: data.email,
     password: data.password,
     status: UserStatusDB.ACTIVE,
