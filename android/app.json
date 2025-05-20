@@ -5,7 +5,7 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "Face_Recognition_Security_System",
+    "scheme": "myapp",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
@@ -59,13 +59,6 @@
       "eas": {
         "projectId": "d19eded2-e886-40f0-bcd9-b1f5f9966e35"
       }
-    },
-    "runtimeVersion": {
-      "policy": "appVersion"
-    },
-    "updates": {
-      "url": "https://u.expo.dev/d19eded2-e886-40f0-bcd9-b1f5f9966e35"
-    },
-    "owner": "nazarenomarkanthony060120"
+    }
   }
 }
