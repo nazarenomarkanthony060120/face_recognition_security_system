@@ -28,5 +28,8 @@ npm install --save-dev prettier eslint eslint-config-prettier eslint-plugin-unus
 #building
 eas build --platform android --profile production
 
+
+#workflow build
+ eas workflow:run .eas/workflows/create-development-builds.yml
 # Tips
 https://dev.to/iammtander/custom-fonts-in-react-native-pro-tip-4693
