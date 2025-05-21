@@ -58,7 +58,7 @@ const LoginFormContents = ({ control }: LoginFormContentsProps) => {
           }}
           render={({ field: { onChange, value } }) => (
             <Input
-              className="w-full py-3 bg-white/10 rounded-xl placeholder:text-gray-400 border border-white/10"
+              className="w-full py-3 bg-white/10 rounded-xl text-white border border-white/10"
               placeholder="Enter your password"
               value={value}
               onChangeText={onChange}
