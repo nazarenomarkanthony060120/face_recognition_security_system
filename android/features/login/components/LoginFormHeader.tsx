@@ -6,13 +6,13 @@ import Typo from '@/components/typo'
 
 const LoginFormHeader = () => {
   return (
-    <SafeAreaView className="items-center justify-center">
+    <SafeAreaView className="items-center justify-center mb-8">
       <ImageWrapper source={SPLASH_ICON} style={{ height: 145, width: 120 }} />
-      <Typo className="text-[34px] text-slate-200 font-bold text-center">
+      <Typo className="text-[32px] text-white font-bold text-center mt-6">
         Welcome Back
       </Typo>
-      <Typo className="text-lg text-slate-300 font-bold text-center">
-        Login to your account
+      <Typo className="text-base text-gray-300 text-center mt-2">
+        Sign in to continue to your account
       </Typo>
     </SafeAreaView>
   )

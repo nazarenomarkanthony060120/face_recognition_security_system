@@ -4,10 +4,11 @@ import {
   SubmitHandler,
   UseFormHandleSubmit,
 } from 'react-hook-form'
-import { SafeAreaView } from 'react-native'
+import { View } from 'react-native'
 import Button from '@/components/button'
 import Typo from '@/components/typo'
 import { useRouter } from 'expo-router'
+import { MaterialIcons } from '@expo/vector-icons'
 
 interface LoginFormFooterProps {
   handleSubmit: UseFormHandleSubmit<FieldValues, FieldValues>
@@ -27,23 +28,31 @@ const LoginFormFooter = ({
   }
 
   return (
-    <SafeAreaView className="gap-3">
+    <View className="gap-4 mt-6">
       <Button
-        className="bg-cyan-400 items-center rounded-3xl p-5"
+        className="bg-white/20 items-center rounded-xl p-4 flex-row justify-center gap-3 border border-white/10"
         onPress={handleSubmit(onSubmit)}
         loading={isPending}
       >
-        <Typo className="text-white">Sign In</Typo>
+        <MaterialIcons
+          name={isPending ? 'hourglass-empty' : 'login'}
+          size={24}
+          color="#ffffff"
+        />
+        <Typo className="text-white font-semibold text-lg">
+          {isPending ? 'Signing In...' : 'Sign In'}
+        </Typo>
       </Button>
-      <SafeAreaView className="items-end ">
+      <View className="items-end">
         <Button
-          className="items-end bg-emerald-500 p-1 px-4 rounded-3xl"
+          className="bg-white/10 items-center rounded-xl p-3 flex-row justify-center gap-3 border border-white/10"
           onPress={navigateToForgotPassword}
         >
-          <Typo className="text-white text-right">Forgot Password</Typo>
+          <MaterialIcons name="lock-reset" size={20} color="#ffffff" />
+          <Typo className="text-white font-medium">Forgot Password</Typo>
         </Button>
-      </SafeAreaView>
-    </SafeAreaView>
+      </View>
+    </View>
   )
 }
 

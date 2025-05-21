@@ -43,33 +43,39 @@ const Input = ({
 
   return (
     <View>
-      <View className="flex-row px-4 py-1 items-center gap-2 bg-cyan-100 w-full rounded-2xl border-2 border-cyan-600 relative">
-        {isIconLeft && icon && icon}
+      <View className="flex-row items-center w-full rounded-xl relative">
+        {isIconLeft && <View className="pl-4 pr-2">{icon}</View>}
         <TextInput
-          className={className}
+          className={`flex-1 py-4 ${isIconLeft ? 'pl-0' : 'pl-4'} ${isIconRight ? 'pr-0' : 'pr-4'} ${className}`}
           placeholder={placeholder}
+          placeholderTextColor="#9ca3af"
           secureTextEntry={isPassword ? !isPasswordVisible : secureTextEntry}
           value={value}
           onChangeText={onChangeText}
           multiline={multiline}
           numberOfLines={numberOfLines}
           editable={editable}
+          textAlignVertical="center"
+          style={{
+            paddingLeft: 16,
+            paddingRight: 16,
+          }}
         />
-        {isIconRight && icon && icon}
+        {isIconRight && <View className="pr-4 pl-2">{icon}</View>}
         {isPassword && (
           <TouchableOpacity
             onPress={() => setIsPasswordVisible((prev) => !prev)}
-            className="absolute right-5"
+            className="absolute right-4"
           >
             {isPasswordVisible ? (
-              <Eye size={24} color="gray" />
+              <Eye size={20} color="#9ca3af" />
             ) : (
-              <EyeOff size={24} color="gray" />
+              <EyeOff size={20} color="#9ca3af" />
             )}
           </TouchableOpacity>
         )}
       </View>
-      {error && <Text className="text-red">{error}</Text>}
+      {error && <Text className="text-red-400 text-sm mt-1 ml-4">{error}</Text>}
     </View>
   )
 }

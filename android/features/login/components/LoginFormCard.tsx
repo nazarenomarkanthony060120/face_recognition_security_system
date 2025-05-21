@@ -38,21 +38,23 @@ const LoginController = () => {
 
   return (
     <ScrollView showsVerticalScrollIndicator={false}>
-      <SafeAreaView className="gap-2">
+      <SafeAreaView className="gap-4">
         <LoginFormHeader />
-        <LoginFormContents control={control} />
-        <LoginFormFooter
-          handleSubmit={handleSubmit}
-          onSubmit={onSubmit}
-          isPending={isPending}
-        />
+        <View className="bg-white/10 p-6 rounded-2xl border border-white/10">
+          <LoginFormContents control={control} />
+          <LoginFormFooter
+            handleSubmit={handleSubmit}
+            onSubmit={onSubmit}
+            isPending={isPending}
+          />
 
-        {authError && (
-          <View className="items-start">
-            <Typo className="text-red-500">{authError}</Typo>
-          </View>
-        )}
-        {Object.keys(errors).length > 0 && <Error errors={errors} />}
+          {authError && (
+            <View className="mt-4 bg-red-500/10 p-3 rounded-xl border border-red-500/20">
+              <Typo className="text-red-400 text-center">{authError}</Typo>
+            </View>
+          )}
+          {Object.keys(errors).length > 0 && <Error errors={errors} />}
+        </View>
       </SafeAreaView>
     </ScrollView>
   )
