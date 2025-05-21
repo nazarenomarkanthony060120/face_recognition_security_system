@@ -1,12 +1,17 @@
 import { SafeAreaView } from 'react-native'
 import React from 'react'
+import { AuthGuard } from '@/components/parts/AuthGaurd'
 
 interface AdminLayoutProps {
   children: React.ReactNode
   className: string
 }
 const AdminLayout = ({ children, className }: AdminLayoutProps) => {
-  return <SafeAreaView className={className}>{children}</SafeAreaView>
+  return (
+    <AuthGuard>
+      <SafeAreaView className={className}>{children}</SafeAreaView>
+    </AuthGuard>
+  )
 }
 
 export default AdminLayout

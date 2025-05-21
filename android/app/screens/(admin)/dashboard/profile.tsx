@@ -1,4 +1,4 @@
-import Profile from '@/features/admin/profile/Profile'
+import Profile from '@/features/common/components/profile/Profile'
 import React from 'react'
 
 const profile = () => {

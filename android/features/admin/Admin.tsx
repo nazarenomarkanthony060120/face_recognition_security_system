@@ -1,3 +1,4 @@
+import { AuthGuard } from '@/components/parts/AuthGaurd'
 import React from 'react'
 import AdminLayout from './common/AdminLayout'
 
