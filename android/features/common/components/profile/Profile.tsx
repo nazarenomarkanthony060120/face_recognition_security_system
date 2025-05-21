@@ -23,7 +23,7 @@ const Profile = () => {
       className="flex-1"
     >
       <SafeAreaView className="flex-1 px-4">
-        <ProfileHeader />
+        <ProfileHeader type={userData?.type} />
         <ProfileFormCard user={userData} />
         <ProfileFooter />
       </SafeAreaView>

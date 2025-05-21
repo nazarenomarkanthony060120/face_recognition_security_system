@@ -5,12 +5,19 @@ import { View } from 'react-native'
 import Button from '@/components/button'
 import { MaterialIcons } from '@expo/vector-icons'
 import Typo from '@/components/typo'
+import { getUserRoutes } from '@/features/common/part/getUserRoutes'
+import { UserType } from '@/utils/types'
 
-const ProfileHeader = () => {
+interface ProfileHeaderProps {
+  type: UserType
+}
+
+const ProfileHeader = ({ type }: ProfileHeaderProps) => {
   const router = useRouter()
 
   const navigateToDashboard = () => {
-    router.push('/screens/(admin)/dashboard/dashboard')
+    const route = getUserRoutes({ type: type })
+    router.push(route)
   }
 
   return (
