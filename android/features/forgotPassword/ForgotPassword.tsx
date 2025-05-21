@@ -5,6 +5,7 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import { useForm } from 'react-hook-form'
 import { useMutation } from '@tanstack/react-query'
 import { sendPasswordResetEmail } from 'firebase/auth'
+import { LinearGradient } from 'expo-linear-gradient'
 import { auth } from '@/lib/firestore'
 import { Header } from './components/Header'
 import { EmailInput } from './components/EmailInput'
@@ -57,26 +58,33 @@ const ForgotPassword = () => {
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-white">
-      <View className="flex-1 p-4">
-        <Header />
+    <LinearGradient
+      colors={['#1e3a8a', '#7c3aed']}
+      start={{ x: 0, y: 1 }}
+      end={{ x: 1, y: 0 }}
+      className="flex-1"
+    >
+      <SafeAreaView className="flex-1">
+        <View className="flex-1 p-4">
+          <Header />
 
-        <View className="mb-6">
-          <EmailInput
-            control={control}
-            errors={errors}
-            isDisabled={resetPasswordMutation.isPending}
+          <View className="mb-6">
+            <EmailInput
+              control={control}
+              errors={errors}
+              isDisabled={resetPasswordMutation.isPending}
+            />
+          </View>
+
+          <SubmitButton
+            onPress={handleSubmit(onSubmit)}
+            isLoading={resetPasswordMutation.isPending}
           />
+
+          <BackToLoginButton />
         </View>
-
-        <SubmitButton
-          onPress={handleSubmit(onSubmit)}
-          isLoading={resetPasswordMutation.isPending}
-        />
-
-        <BackToLoginButton />
-      </View>
-    </SafeAreaView>
+      </SafeAreaView>
+    </LinearGradient>
   )
 }
 

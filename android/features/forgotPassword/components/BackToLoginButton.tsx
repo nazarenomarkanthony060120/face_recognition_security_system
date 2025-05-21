@@ -7,7 +7,7 @@ export const BackToLoginButton = () => {
 
   return (
     <TouchableOpacity onPress={() => router.back()} className="items-center">
-      <Text className="text-[#00bdcf] font-bold">Back to Login</Text>
+      <Text className="text-white font-bold">Back to Login</Text>
     </TouchableOpacity>
   )
 }

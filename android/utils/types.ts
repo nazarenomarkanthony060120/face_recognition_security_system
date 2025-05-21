@@ -72,3 +72,10 @@ export type AddStudent = {
   name: string
   gradeSection: string
 }
+
+// String declared
+export type AuthErrorType =
+  | String
+  | 'No account found with this email'
+  | 'Invalid password'
+  | 'Invalid email address'

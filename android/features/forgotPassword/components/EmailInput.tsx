@@ -28,23 +28,22 @@ export const EmailInput = ({
       render={({ field: { onChange, value } }) => (
         <>
           <Input
-            className={'w-full py-3 placeholder:text-slate-400 '}
+            className={
+              'w-full py-3 placeholder:text-gray-300 bg-white/10 border-white/20'
+            }
             placeholder={'Enter your email'}
             value={value}
             onChangeText={onChange}
             secureTextEntry={false}
             isIconLeft
             icon={
-              <MaterialIcons
-                name={'alternate-email'}
-                size={20}
-                color="#00bdcf"
-              />
+              <MaterialIcons name={'alternate-email'} size={20} color="#000" />
             }
             editable={!isDisabled}
+            placeholderTextColor="#ffffff80"
           />
           {errors.email && (
-            <Text className="text-red-500 text-sm mb-2">
+            <Text className="text-red-300 text-sm mb-2">
               {errors.email.message?.toString()}
             </Text>
           )}

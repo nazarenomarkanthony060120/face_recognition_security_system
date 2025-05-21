@@ -1,31 +1,37 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { useForm, SubmitHandler, FieldValues } from 'react-hook-form'
-import { LoginRequest } from '@/utils/types'
+import { AuthErrorType, LoginRequest } from '@/utils/types'
 import LoginFormHeader from './LoginFormHeader'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import LoginFormContents from './LoginFormContents'
 import LoginFormFooter from './LoginFormFooter'
-import { ScrollView } from 'react-native'
+import { ScrollView, View } from 'react-native'
 import Typo from '@/components/typo'
 import { useRouter } from 'expo-router'
 import { useLogin } from '@/hooks/login'
+import { getUserRoutes } from '@/features/common/part/getUserRoutes'
+import { getErrorMessage } from '@/features/common/part/getErrorMessage'
+import Error from '@/components/parts/Error'
 
 const LoginController = () => {
-  const { control, handleSubmit } = useForm()
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm()
+  const [authError, setAuthError] = useState<AuthErrorType>()
   const { mutate: login, error, isPending } = useLogin()
   const router = useRouter()
 
   const onSubmit: SubmitHandler<FieldValues> = (data) => {
     login(data as LoginRequest, {
       onSuccess: (data) => {
-        console.log('Login success:', data)
-        router.push({
-          pathname: '/(auth)/loginAuthentication',
-          params: { type: data?.type, phoneNumber: data?.phoneNumber },
-        })
+        const route = getUserRoutes({ type: data?.type })
+        router.push(route)
       },
-      onError: (error) => {
-        console.log('Login error:', error.stack)
+      onError: (error: Error) => {
+        const errorMessage = getErrorMessage(error.message)
+        setAuthError(errorMessage)
       },
     })
   }
@@ -41,9 +47,12 @@ const LoginController = () => {
           isPending={isPending}
         />
 
-        <Typo>
-          {error && <Typo className="text-red-500">{error.message}</Typo>}
-        </Typo>
+        {authError && (
+          <View className="items-start">
+            <Typo className="text-red-500">{authError}</Typo>
+          </View>
+        )}
+        {Object.keys(errors).length > 0 && <Error errors={errors} />}
       </SafeAreaView>
     </ScrollView>
   )
