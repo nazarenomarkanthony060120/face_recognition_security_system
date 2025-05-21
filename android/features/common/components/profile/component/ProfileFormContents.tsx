@@ -6,7 +6,7 @@ import { Timestamp } from 'firebase/firestore'
 import { getUserStatus } from '@/features/common/part/getUserStatus'
 import { MaterialIcons } from '@expo/vector-icons'
 import Typo from '@/components/typo'
-import { PERSON_BLACK_ICON } from '@/constants/image'
+import { PERSON_ICON } from '@/constants/image'
 import ImageWrapper from '@/components/parts/Image'
 
 interface ProfileFormContentsProps {
@@ -22,7 +22,8 @@ const ProfileFormContents = ({ user }: ProfileFormContentsProps) => {
         <View className="items-center mb-8">
           <View className="bg-white/20 p-4 rounded-full mb-4 border-2 border-white/10">
             <ImageWrapper
-              source={PERSON_BLACK_ICON}
+              className="p-4"
+              source={PERSON_ICON}
               style={{ height: 80, width: 80 }}
             />
           </View>

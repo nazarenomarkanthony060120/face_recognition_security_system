@@ -29,7 +29,7 @@ const ProfileFooter = () => {
         loading={isPending}
       >
         <MaterialIcons name="logout" size={24} color="#ffffff" />
-        <Typo className="text-white font-medium text-lg">Sign Out</Typo>
+        <Typo className="text-white font-medium ml-3 text-lg">Sign Out</Typo>
       </Button>
       {error && (
         <Typo className="text-red-400 text-center">{error.message}</Typo>

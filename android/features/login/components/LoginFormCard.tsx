@@ -26,8 +26,10 @@ const LoginController = () => {
   const onSubmit: SubmitHandler<FieldValues> = (data) => {
     login(data as LoginRequest, {
       onSuccess: (data) => {
-        const route = getUserRoutes({ type: data?.type })
-        router.push(route)
+        router.push({
+          pathname: '/(auth)/loginAuthentication',
+          params: { type: data?.type, phoneNumber: data?.phoneNumber },
+        })
       },
       onError: (error: Error) => {
         const errorMessage = getErrorMessage(error.message)

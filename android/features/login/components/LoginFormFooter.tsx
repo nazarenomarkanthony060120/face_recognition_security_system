@@ -39,7 +39,7 @@ const LoginFormFooter = ({
           size={24}
           color="#ffffff"
         />
-        <Typo className="text-white font-semibold text-lg">
+        <Typo className="text-white ml-3 font-semibold text-lg">
           {isPending ? 'Signing In...' : 'Sign In'}
         </Typo>
       </Button>
@@ -49,7 +49,7 @@ const LoginFormFooter = ({
           onPress={navigateToForgotPassword}
         >
           <MaterialIcons name="lock-reset" size={20} color="#ffffff" />
-          <Typo className="text-white font-medium">Forgot Password</Typo>
+          <Typo className="text-white ml-3 font-medium">Forgot Password</Typo>
         </Button>
       </View>
     </View>

@@ -2,7 +2,7 @@ import { Text, Pressable, View } from 'react-native'
 import React from 'react'
 import { useRouter } from 'expo-router'
 import { ParentType, UserStatusValue } from '@/utils/types'
-import { PERSON_BLACK_ICON } from '@/constants/image'
+import { PERSON_ICON } from '@/constants/image'
 import { getUserStatus } from '@/features/common/part/getUserStatus'
 import ImageWrapper from '@/components/parts/Image'
 import { MaterialIcons } from '@expo/vector-icons'
@@ -32,7 +32,7 @@ const DashboardLists = ({ parent }: DashboardListsProps) => {
       <View className="flex-row items-center gap-4">
         <View className="bg-white/20 p-3 rounded-full">
           <ImageWrapper
-            source={PERSON_BLACK_ICON}
+            source={PERSON_ICON}
             style={{ height: 35, width: 35 }}
           />
         </View>

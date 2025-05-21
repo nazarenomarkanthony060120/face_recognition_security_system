@@ -5,7 +5,6 @@ import { useFetchAllParents } from '@/hooks/admin/useFetchAllParents'
 import DashboardLists from './DashboardLists'
 import { MaterialIcons } from '@expo/vector-icons'
 import Typo from '@/components/typo'
-import { ParentType, UserStatusValue } from '@/utils/types'
 
 interface DashboardFormCardProps {
   searchQuery: string

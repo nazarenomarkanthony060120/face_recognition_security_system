@@ -2,12 +2,7 @@ import { View, ScrollView } from 'react-native'
 import React from 'react'
 import { User } from '@/utils/types'
 import Typo from '@/components/typo'
-import {
-  AntDesign,
-  FontAwesome5,
-  Ionicons,
-  MaterialIcons,
-} from '@expo/vector-icons'
+import { MaterialIcons } from '@expo/vector-icons'
 import { getUserStatus } from '@/features/common/part/getUserStatus'
 import { createdAtFormatted } from '@/features/common/part/getCreatedAtFormatted'
 import { Timestamp } from 'firebase/firestore'

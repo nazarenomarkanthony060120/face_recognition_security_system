@@ -3,7 +3,7 @@ import React from 'react'
 import { Student } from '@/utils/types'
 import { useRouter } from 'expo-router'
 import ImageWrapper from '@/components/parts/Image'
-import { PERSON_BLACK_ICON } from '@/constants/image'
+import { PERSON_ICON } from '@/constants/image'
 import Typo from '@/components/typo'
 import { MaterialIcons } from '@expo/vector-icons'
 
@@ -29,7 +29,7 @@ const ViewLists = ({ student }: ViewListsProps) => {
       <View className="flex-row items-center gap-4">
         <View className="bg-white/20 p-3 rounded-full">
           <ImageWrapper
-            source={PERSON_BLACK_ICON}
+            source={PERSON_ICON}
             style={{ height: 35, width: 35 }}
           />
         </View>
