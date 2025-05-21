@@ -22,7 +22,7 @@ export enum UserStatusValue {
 
 export enum UserType {
   USER = 'User',
-  ADMIN = 'Admin',
+  ADMININISTRATOR = 'Administrator',
 }
 
 export type RegisterParentType = {

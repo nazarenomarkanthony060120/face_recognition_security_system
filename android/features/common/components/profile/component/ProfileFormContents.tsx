@@ -95,7 +95,7 @@ const ProfileFormContents = ({ user }: ProfileFormContentsProps) => {
             </View>
             <View className="flex-row items-center ml-12">
               <View className="bg-blue-500/20 px-3 py-1 rounded-full">
-                <Typo className="text-blue-400">Administrator</Typo>
+                <Typo className="text-blue-400">{user.type}</Typo>
               </View>
             </View>
           </View>
