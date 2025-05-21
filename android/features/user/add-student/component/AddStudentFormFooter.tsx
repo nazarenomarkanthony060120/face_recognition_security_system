@@ -7,7 +7,8 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context'
 import Button from '@/components/button'
 import Typo from '@/components/typo'
-import { ActivityIndicator } from 'react-native'
+import { ActivityIndicator, View } from 'react-native'
+import { MaterialIcons } from '@expo/vector-icons'
 
 interface AddStudentFormFooterProps {
   handleSubmit: UseFormHandleSubmit<FieldValues, FieldValues>
@@ -24,23 +25,28 @@ const AddStudentFormFooter = ({
 }: AddStudentFormFooterProps) => {
   if (isCreate) {
     return (
-      <SafeAreaView className="gap-3">
-        <Button className="bg-slate-300 items-center rounded-3xl gap-3 p-5">
-          <ActivityIndicator />
-          <Typo className="text-white">Add Student</Typo>
+      <SafeAreaView className="mt-6">
+        <Button className="bg-white/10 items-center rounded-xl p-4 border border-white/10">
+          <View className="flex-row items-center gap-2">
+            <ActivityIndicator color="#ffffff" />
+            <Typo className="text-white">Adding Student...</Typo>
+          </View>
         </Button>
       </SafeAreaView>
     )
   }
 
   return (
-    <SafeAreaView className="gap-3">
+    <SafeAreaView className="mt-6">
       <Button
-        className="bg-cyan-400 items-center rounded-3xl p-5"
+        className="bg-white/10 items-center rounded-xl p-4 border border-white/10"
         onPress={handleSubmit(onSubmit)}
         loading={isPending}
       >
-        <Typo className="text-white">Add Student</Typo>
+        <View className="flex-row items-center gap-2">
+          <MaterialIcons name="person-add" size={20} color="#ffffff" />
+          <Typo className="text-white">Add Student</Typo>
+        </View>
       </Button>
     </SafeAreaView>
   )
