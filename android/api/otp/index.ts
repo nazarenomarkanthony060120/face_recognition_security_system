@@ -1,5 +1,13 @@
 import { db, doc, setDoc, serverTimestamp } from '@/lib/firestore'
-import { collection, query, where, getDocs, deleteDoc, orderBy, limit } from 'firebase/firestore'
+import {
+  collection,
+  query,
+  where,
+  getDocs,
+  deleteDoc,
+  orderBy,
+  limit,
+} from 'firebase/firestore'
 import { sendOTPNotification } from '../notifications'
 
 interface SendOTPRequest {
@@ -59,7 +67,7 @@ export const verifyOTP = async ({ phoneNumber, otp }: VerifyOTPRequest) => {
       receivedOTP: otp,
       receivedOTPLength: otp.length,
       receivedOTPType: typeof otp,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     })
 
     // Query for the most recent OTP for this phone number
@@ -67,14 +75,14 @@ export const verifyOTP = async ({ phoneNumber, otp }: VerifyOTPRequest) => {
       collection(db, 'otps'),
       where('phoneNumber', '==', phoneNumber),
       orderBy('createdAt', 'desc'),
-      limit(1)
+      limit(1),
     )
 
     const querySnapshot = await getDocs(q)
     console.log('Firestore query results:', {
       foundDocuments: querySnapshot.size,
       phoneNumber,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     })
 
     if (querySnapshot.empty) {
@@ -99,7 +107,7 @@ export const verifyOTP = async ({ phoneNumber, otp }: VerifyOTPRequest) => {
       expiresAt: otpData.expiresAt?.toDate(),
       createdAt: otpData.createdAt?.toDate(),
       currentTime: new Date(),
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     })
 
     // Check if OTP has expired
@@ -112,7 +120,7 @@ export const verifyOTP = async ({ phoneNumber, otp }: VerifyOTPRequest) => {
     if (expiresAt < new Date()) {
       console.log('OTP expired:', {
         expiresAt: expiresAt.toISOString(),
-        currentTime: new Date().toISOString()
+        currentTime: new Date().toISOString(),
       })
       await deleteDoc(otpDoc.ref)
       throw new Error('OTP has expired')
@@ -128,22 +136,32 @@ export const verifyOTP = async ({ phoneNumber, otp }: VerifyOTPRequest) => {
       storedOTPLength: storedOTP?.length,
       receivedOTPLength: receivedOTP.length,
       exactMatch: storedOTP === receivedOTP,
-      caseInsensitiveMatch: storedOTP?.toLowerCase() === receivedOTP.toLowerCase(),
+      caseInsensitiveMatch:
+        storedOTP?.toLowerCase() === receivedOTP.toLowerCase(),
       storedOTPChars: storedOTP?.split('').map((c: string) => c.charCodeAt(0)),
-      receivedOTPChars: receivedOTP.split('').map((c: string) => c.charCodeAt(0)),
-      timestamp: new Date().toISOString()
+      receivedOTPChars: receivedOTP
+        .split('')
+        .map((c: string) => c.charCodeAt(0)),
+      timestamp: new Date().toISOString(),
     })
 
     // Try both exact and case-insensitive comparison
-    if (storedOTP !== receivedOTP && storedOTP?.toLowerCase() !== receivedOTP.toLowerCase()) {
+    if (
+      storedOTP !== receivedOTP &&
+      storedOTP?.toLowerCase() !== receivedOTP.toLowerCase()
+    ) {
       console.log('OTP verification failed:', {
         stored: storedOTP,
         received: receivedOTP,
         storedLength: storedOTP?.length,
         receivedLength: receivedOTP.length,
-        storedOTPChars: storedOTP?.split('').map((c: string) => c.charCodeAt(0)),
-        receivedOTPChars: receivedOTP.split('').map((c: string) => c.charCodeAt(0)),
-        timestamp: new Date().toISOString()
+        storedOTPChars: storedOTP
+          ?.split('')
+          .map((c: string) => c.charCodeAt(0)),
+        receivedOTPChars: receivedOTP
+          .split('')
+          .map((c: string) => c.charCodeAt(0)),
+        timestamp: new Date().toISOString(),
       })
       throw new Error('Invalid OTP')
     }
@@ -157,4 +175,4 @@ export const verifyOTP = async ({ phoneNumber, otp }: VerifyOTPRequest) => {
     console.error('Error verifying OTP:', error)
     throw error
   }
-} 
+}

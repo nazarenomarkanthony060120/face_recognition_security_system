@@ -1,10 +1,16 @@
-import { doc, getDoc, query, collection, where, getDocs } from 'firebase/firestore'
+import {
+  doc,
+  getDoc,
+  query,
+  collection,
+  where,
+  getDocs,
+} from 'firebase/firestore'
 import { db } from '@/lib/firestore'
 import { Student, UserIdRequest } from '@/utils/types'
 import { documentId } from 'firebase/firestore' // 🔑 import this!
 
 export const fetchStudentById = async ({ id }: UserIdRequest) => {
-
   const q = query(collection(db, 'students'), where(documentId(), '==', id))
   const querySnapshot = await getDocs(q)
 

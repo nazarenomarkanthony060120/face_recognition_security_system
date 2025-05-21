@@ -1,4 +1,4 @@
-import { UserStatusDB, UserStatusValue } from "@/utils/types"
+import { UserStatusDB, UserStatusValue } from '@/utils/types'
 
 export const getUserStatus = (status: number) => {
   switch (status) {

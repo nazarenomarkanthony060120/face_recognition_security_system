@@ -3,7 +3,6 @@ import { collection, getDocs, query, where } from 'firebase/firestore'
 import { Student, UserIdRequest } from '@/utils/types'
 
 export const fetchAllStudents = async ({ id }: UserIdRequest) => {
-
   const q = query(collection(db, 'students'), where('parentId', '==', id))
   const querySnapshot = await getDocs(q)
 
