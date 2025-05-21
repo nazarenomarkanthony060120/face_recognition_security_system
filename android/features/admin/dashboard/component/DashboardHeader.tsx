@@ -38,6 +38,10 @@ const DashboardHeader = ({
     onSearch(text)
   }
 
+  const navigateToProfile = () => {
+    router.push('/screens/(admin)/dashboard/profile')
+  }
+
   return (
     <SafeAreaView className="mb-6">
       <View className="flex-row justify-between items-center mb-6">
@@ -45,12 +49,20 @@ const DashboardHeader = ({
           <Typo className="text-3xl text-white font-bold">Dashboard</Typo>
           <Typo className="text-gray-400">Welcome back, Admin</Typo>
         </View>
-        <TouchableOpacity
-          className="bg-white/10 p-3 rounded-full"
-          onPress={() => router.push('/screens/(admin)/dashboard/addParent')}
-        >
-          <MaterialIcons name="person-add" size={24} color="#ffffff" />
-        </TouchableOpacity>
+        <View className="flex-row gap-2">
+          <TouchableOpacity
+            className="bg-white/10 p-3 rounded-full"
+            onPress={navigateToProfile}
+          >
+            <MaterialIcons name="person" size={24} color="#ffffff" />
+          </TouchableOpacity>
+          <TouchableOpacity
+            className="bg-white/10 p-3 rounded-full"
+            onPress={() => router.push('/screens/(admin)/dashboard/addParent')}
+          >
+            <MaterialIcons name="person-add" size={24} color="#ffffff" />
+          </TouchableOpacity>
+        </View>
       </View>
 
       <View className="flex-row gap-4 mb-6">
@@ -99,7 +111,7 @@ const DashboardHeader = ({
         </TouchableOpacity>
       </View>
 
-      <View className="bg-white/10 rounded-xl p-3 flex-row items-center">
+      <View className="flex-row items-center bg-white/10 p-3 rounded-xl">
         <MaterialIcons name="search" size={24} color="#ffffff80" />
         <TextInput
           placeholder="Search parents..."
