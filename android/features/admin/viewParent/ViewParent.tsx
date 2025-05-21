@@ -4,6 +4,8 @@ import { useFetchUserById } from '@/hooks/common/fetchUserById'
 import ViewParentCard from './component/ViewParentCard'
 import ViewParentHeader from './component/ViewParentHeader'
 import LoadingIndicator from '@/features/common/components/loadingIndicator/LoadingIndicator'
+import { LinearGradient } from 'expo-linear-gradient'
+import { SafeAreaView } from 'react-native-safe-area-context'
 
 interface ViewParentProps {
   params: URLSearchParams
@@ -16,10 +18,19 @@ const ViewParent = ({ params }: ViewParentProps) => {
   if (isLoading) return <LoadingIndicator />
 
   return (
-    <Admin className="flex-1 bg-slate-800 justify-between">
-      <ViewParentHeader />
-      <ViewParentCard parent={parentData} />
-    </Admin>
+    <LinearGradient
+      colors={['#1e3a8a', '#7c3aed']}
+      start={{ x: 0, y: 1 }}
+      end={{ x: 1, y: 0 }}
+      className="flex-1"
+    >
+      <SafeAreaView className="flex-1">
+        <Admin className="flex-1 justify-between">
+          <ViewParentHeader />
+          <ViewParentCard parent={parentData} />
+        </Admin>
+      </SafeAreaView>
+    </LinearGradient>
   )
 }
 
