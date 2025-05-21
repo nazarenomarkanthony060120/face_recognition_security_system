@@ -1,5 +1,7 @@
 import React from 'react'
-import { TouchableOpacity, Text } from 'react-native'
+import { TouchableOpacity } from 'react-native'
+import { MaterialIcons } from '@expo/vector-icons'
+import Typo from '@/components/typo'
 
 interface SubmitButtonProps {
   onPress: () => void
@@ -9,13 +11,18 @@ interface SubmitButtonProps {
 export const SubmitButton = ({ onPress, isLoading }: SubmitButtonProps) => {
   return (
     <TouchableOpacity
-      className={`bg-white p-4 rounded-lg mb-4 ${isLoading ? 'opacity-50' : ''}`}
+      className={`bg-white/20 p-4 rounded-xl mb-6 border border-white/10 flex-row items-center justify-center gap-3 ${isLoading ? 'opacity-50' : ''}`}
       onPress={onPress}
       disabled={isLoading}
     >
-      <Text className="text-[#1e3a8a] text-center font-bold text-lg">
+      <MaterialIcons
+        name={isLoading ? 'hourglass-empty' : 'send'}
+        size={24}
+        color="#ffffff"
+      />
+      <Typo className="text-white font-semibold text-lg">
         {isLoading ? 'Sending...' : 'Send Reset Link'}
-      </Text>
+      </Typo>
     </TouchableOpacity>
   )
 }
