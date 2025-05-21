@@ -1,6 +1,5 @@
-import { ScrollView } from 'react-native'
+import { View } from 'react-native'
 import React, { useState } from 'react'
-import { SafeAreaView } from 'react-native-safe-area-context'
 import AddParentFormContents from './AddParentFormContents'
 import AddParentFormHeader from './AddParentFormHeader'
 import AddParentFormFooter from './AddParentFormFooter'
@@ -32,24 +31,32 @@ const AddParentFormCard = () => {
   }
 
   return (
-    <SafeAreaView className="gap-2 p-5">
+    <View className="bg-white/10 rounded-xl border border-white/10 p-6 mb-6">
       <AddParentFormHeader />
       {showCountdown && (
         <CountDown
           time={5}
-          route={'/screens/(admin)/dashboard'}
+          route={'/screens/(admin)/dashboard/dashboard'}
           message="You will be redirected to Dashboard in"
           setShowCountdown={setShowCountdown}
         />
       )}
-      <AddParentFormContents control={control} getValues={getValues} />
-      <AddParentFormFooter
-        handleSubmit={handleSubmit}
-        onSubmit={onSubmit}
-        isPending={isPending}
-      />
-      {Object.keys(errors).length > 0 && <Error errors={errors} />}
-    </SafeAreaView>
+      <View className="mt-6">
+        <AddParentFormContents control={control} getValues={getValues} />
+      </View>
+      <View className="mt-8">
+        <AddParentFormFooter
+          handleSubmit={handleSubmit}
+          onSubmit={onSubmit}
+          isPending={isPending}
+        />
+      </View>
+      {Object.keys(errors).length > 0 && (
+        <View className="mt-4">
+          <Error errors={errors} />
+        </View>
+      )}
+    </View>
   )
 }
 

@@ -2,31 +2,24 @@ import React from 'react'
 import { useRouter } from 'expo-router'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import Button from '@/components/button'
-import { Ionicons } from '@expo/vector-icons'
+import { MaterialIcons } from '@expo/vector-icons'
 import Typo from '@/components/typo'
 
 const AddParentHeader = () => {
   const router = useRouter()
 
-  const navigateToMyStore = () => {
+  const navigateToDashboard = () => {
     router.replace('/screens/(admin)/dashboard/dashboard')
   }
 
   return (
-    <SafeAreaView className="py-5">
+    <SafeAreaView className="py-4">
       <Button
-        className="w-44 flex-row items-center gap-2"
-        onPress={navigateToMyStore}
-        icon={
-          <Ionicons
-            name="arrow-back"
-            className="bg-cyan-500 rounded-lg p-2"
-            size={16}
-            color="white"
-          />
-        }
+        className="bg-white/10 w-32 flex-row items-center gap-2 rounded-xl p-3"
+        onPress={navigateToDashboard}
       >
-        <Typo className="text-slate-200">Back</Typo>
+        <MaterialIcons name="arrow-back" size={20} color="#ffffff" />
+        <Typo className="text-white font-medium">Back</Typo>
       </Button>
     </SafeAreaView>
   )

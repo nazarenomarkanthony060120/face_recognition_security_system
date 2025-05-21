@@ -21,7 +21,7 @@ export const registerParent = async (data: RegisterParentType) => {
     phoneNumber: data.phoneNumber,
     email: data.email,
     password: data.password,
-    status: UserStatusDB.ACTIVE,
+    status: data.status,
     type: UserType.USER,
     createdAt: serverTimestamp(),
     updatedAt: serverTimestamp(),
