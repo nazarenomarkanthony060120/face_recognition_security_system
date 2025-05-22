@@ -10,7 +10,8 @@
     "web": "expo start --web",
     "test": "jest --watchAll",
     "lint": "expo lint",
-    "bullshit": "npx prettier . --write"
+    "bullshit": "npx prettier . --write",
+    "ohyeah": "eas build --profile preview --platform android "
   },
   "jest": {
     "preset": "jest-expo"
