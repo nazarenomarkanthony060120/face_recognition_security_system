@@ -180,7 +180,7 @@ const LoginAuthentication = ({ params }: LoginAuthenticationProps) => {
       )
 
       // If verification is successful, navigate to the appropriate screen based on user type
-      const route = getUserRoutes(type)
+      const route = getUserRoutes({ type: type })
       router.push(route)
     } catch (error) {
       console.error('OTP verification error:', error)

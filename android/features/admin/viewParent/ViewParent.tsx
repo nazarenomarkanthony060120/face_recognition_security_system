@@ -13,7 +13,11 @@ interface ViewParentProps {
 
 const ViewParent = ({ params }: ViewParentProps) => {
   const parentId = params.get('id')
-  const { data: parentData, isLoading } = useFetchUserById({ id: parentId })
+  const {
+    data: parentData,
+    isLoading,
+    refetch,
+  } = useFetchUserById({ id: parentId })
 
   if (isLoading) return <LoadingIndicator />
 
@@ -27,7 +31,7 @@ const ViewParent = ({ params }: ViewParentProps) => {
       <SafeAreaView className="flex-1">
         <Admin className="flex-1 justify-between">
           <ViewParentHeader />
-          <ViewParentCard parent={parentData} />
+          <ViewParentCard parent={parentData} onRefetch={refetch} />
         </Admin>
       </SafeAreaView>
     </LinearGradient>

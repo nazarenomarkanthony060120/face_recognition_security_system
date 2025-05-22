@@ -1,4 +1,4 @@
-import { View, ScrollView } from 'react-native'
+import { View, ScrollView, Text, TouchableOpacity, Alert } from 'react-native'
 import React from 'react'
 import { User } from '@/utils/types'
 import Typo from '@/components/typo'
@@ -6,15 +6,36 @@ import { MaterialIcons } from '@expo/vector-icons'
 import { getUserStatus } from '@/features/common/part/getUserStatus'
 import { createdAtFormatted } from '@/features/common/part/getCreatedAtFormatted'
 import { Timestamp } from 'firebase/firestore'
+import { useUpdateStatus } from '@/hooks/admin/useUpdateStatus'
 
 interface ViewParentFormContentsProps {
   parent: User | undefined
+  onRefetch?: () => void
 }
 
-const ViewParentFormContents = ({ parent }: ViewParentFormContentsProps) => {
+const ViewParentFormContents = ({
+  parent,
+  onRefetch,
+}: ViewParentFormContentsProps) => {
   if (!parent) return null
 
+  const { mutate: updateStatus, isPending } = useUpdateStatus()
   const isActive = getUserStatus(Number(parent.status)) === 'Active'
+
+  const handleUpdateStatus = () => {
+    if (!parent?.id) return
+    updateStatus(
+      { id: parent.id },
+      {
+        onSuccess: () => {
+          onRefetch?.()
+        },
+        onError: () => {
+          Alert.alert('Failed to update status')
+        },
+      },
+    )
+  }
 
   return (
     <ScrollView showsVerticalScrollIndicator={false} className="flex-1">
@@ -109,6 +130,46 @@ const ViewParentFormContents = ({ parent }: ViewParentFormContentsProps) => {
                 </Typo>
               </View>
             </View>
+          </View>
+        </View>
+
+        {/* Status Action Section */}
+        <View className="bg-white/10 p-4 rounded-xl border border-white/10">
+          <View className="flex-row items-center gap-3 mb-4">
+            <View className="bg-white/20 p-3 rounded-full">
+              <MaterialIcons name="info" size={24} color="#ffffff" />
+            </View>
+            <View className="flex-1">
+              <Text className="text-white text-lg font-semibold">
+                Account Status
+              </Text>
+              <Text
+                className={`${isActive ? 'text-green-400' : 'text-red-400'} font-medium`}
+              >
+                {getUserStatus(Number(parent.status))}
+              </Text>
+            </View>
+            <TouchableOpacity
+              onPress={handleUpdateStatus}
+              disabled={isPending}
+              className={`px-4 py-2 rounded-lg ${
+                isActive
+                  ? 'bg-red-500/20 border border-red-500'
+                  : 'bg-green-500/20 border border-green-500'
+              } ${isPending ? 'opacity-50' : ''}`}
+            >
+              <Text
+                className={`${
+                  isActive ? 'text-red-500' : 'text-green-500'
+                } font-semibold`}
+              >
+                {isPending
+                  ? 'Updating...'
+                  : isActive
+                    ? 'Deactivate'
+                    : 'Activate'}
+              </Text>
+            </TouchableOpacity>
           </View>
         </View>
       </View>
