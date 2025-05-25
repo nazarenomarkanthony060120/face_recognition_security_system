@@ -120,7 +120,7 @@ const DashboardHeader = () => {
             </>
           )}
         </TouchableOpacity>
-        <TouchableOpacity
+        {/* <TouchableOpacity
           className="flex-1 bg-white/10 p-4 rounded-xl"
           onPress={() => setShowSearch(false)}
         >
@@ -165,7 +165,7 @@ const DashboardHeader = () => {
               </Typo>
             </>
           )}
-        </TouchableOpacity>
+        </TouchableOpacity> */}
       </View>
     </View>
   )
