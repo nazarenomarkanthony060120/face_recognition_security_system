@@ -4,8 +4,7 @@ import { Student } from '@/utils/types'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import Typo from '@/components/typo'
 import { MaterialIcons } from '@expo/vector-icons'
-import { getHistory } from '@/api/history/getHistory'
-import { useQuery } from '@tanstack/react-query'
+import { fetchStudentHistory } from '@/hooks/common/fetchStudentHistory'
 
 interface MyStudentFormContentsProps {
   student: Student | null | undefined
@@ -19,11 +18,7 @@ interface AttendanceRecord {
 }
 
 const MyStudentFormContents = ({ student }: MyStudentFormContentsProps) => {
-  const { data = [], isLoading } = useQuery({
-    queryKey: ['history', student?.id],
-    queryFn: () => student ? getHistory(student.id) : Promise.resolve([]),
-    enabled: !!student,
-  })
+  const { data = [], isLoading } = fetchStudentHistory(student?.id)
 
   if (!student) return null
 
