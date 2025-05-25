@@ -74,6 +74,25 @@ export type AddStudent = {
   gradeSection: string
 }
 
+export enum HistoryStatusText {
+  IN = 'In',
+  OUT = 'Out',
+  UNKNOWN = 'Unknown',
+}
+
+export enum HistoryStatus {
+  IN = 1,
+  OUT = 2,
+  UNKNOWN = 0,
+}
+
+export type History = {
+  id: string
+  studentId: string
+  status: HistoryStatus
+  timestamp: FieldValue
+}
+
 // String declared
 export type AuthErrorType =
   | String

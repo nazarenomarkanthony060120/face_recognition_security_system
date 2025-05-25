@@ -1,10 +1,10 @@
 import { useQuery } from '@tanstack/react-query'
-import { getHistory } from '@/api/history/getHistory'
+import { History, UserIdRequest } from '@/utils/types'
+import { fetchHistory } from '@/api/common/fetchHistory'
 
-export const fetchStudentHistoryById = (studentId?: string | null) => {
-  return useQuery({
-    queryKey: ['history', studentId],
-    queryFn: () => (studentId ? getHistory(studentId) : Promise.resolve([])),
-    enabled: !!studentId,
+export const fetchStudentHistoryById = ({id}: UserIdRequest) => {
+  return useQuery<History[]>({
+    queryKey: ['fetchHistory', id],
+    queryFn: () => fetchHistory({id: id}),
   })
-} 
+}

@@ -1,27 +1,23 @@
 import { View } from 'react-native'
 import React from 'react'
-import { Student } from '@/utils/types'
+import { HistoryStatusText, Student } from '@/utils/types'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import Typo from '@/components/typo'
 import { MaterialIcons } from '@expo/vector-icons'
 import { fetchStudentHistoryById } from '@/hooks/common/fetchStudentHistoryById'
+import { getHistoryStatus } from '@/features/common/part/getHistoryStatus'
+import { Timestamp } from 'firebase/firestore'
+import { createdAtFormatted } from '@/features/common/part/getCreatedAtFormatted'
+import { getTimeFormatted } from '@/features/common/part/getTimeFormatted'
 
 interface MyStudentFormContentsProps {
   student: Student | null | undefined
 }
 
-interface AttendanceRecord {
-  id: string
-  timestamp?: { toDate: () => Date }
-  status?: number
-  student_uid?: string
-}
-
 const MyStudentFormContents = ({ student }: MyStudentFormContentsProps) => {
   if (!student) return null
-  const { data = student, isLoading } = fetchStudentHistoryById(student.id)
-
-  const attendanceHistory = data
+  const { data: fetchHistory, isLoading } = fetchStudentHistoryById({id: student.id})
+  console.log('History Data:', fetchHistory)
 
   return (
     <SafeAreaView className="flex-1">
@@ -67,79 +63,57 @@ const MyStudentFormContents = ({ student }: MyStudentFormContentsProps) => {
           </View>
 
           <View className="gap-3">
-            {isLoading ? (
-              <Typo className="text-white">Loading...</Typo>
-            ) : attendanceHistory.length === 0 ? (
-              <Typo className="text-white">No history found.</Typo>
-            ) : (
-              attendanceHistory.map((recordRaw, index) => {
-                const record = recordRaw as AttendanceRecord
-                // Format fields for display
-                let date = ''
-                let time = ''
-                if (record.timestamp && record.timestamp.toDate) {
-                  const jsDate = record.timestamp.toDate()
-                  date = jsDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
-                  time = jsDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-                }
-                let statusText = 'Unknown'
-                let icon = 'help'
-                let color = '#a3a3a3'
-                if (record.status === 1) {
-                  statusText = 'IN'
-                  icon = 'check-circle'
-                  color = '#4ade80'
-                } else if (record.status === 2) {
-                  statusText = 'OUT'
-                  icon = 'cancel'
-                  color = '#f87171'
-                }
-                const location = 'Main Gate'
-                return (
-                  <View
-                    key={index}
-                    className="bg-white/10 p-4 rounded-xl border border-white/10"
-                  >
-                    {/* Header Row */}
-                    <View className="flex-row items-center justify-between mb-3">
-                      <View className="flex-row items-center gap-3">
-                        <View className="bg-white/20 p-2 rounded-full">
-                          <MaterialIcons
-                            name={icon as any}
-                            size={20}
-                            color={color}
-                          />
-                        </View>
-                        <View>
-                          <Typo className="text-white font-medium">
-                            {statusText}
-                          </Typo>
-                          <Typo className="text-sm text-gray-400">
-                            {date}
-                          </Typo>
-                        </View>
-                      </View>
-                      <View className="bg-white/10 px-3 py-1 rounded-full">
-                        <Typo className="text-sm text-gray-400">{time}</Typo>
-                      </View>
-                    </View>
-
-                    {/* Details Row */}
-                    <View className="flex-row items-center gap-2 ml-12">
+            {fetchHistory?.length === 0 && (
+                <Typo className="text-sm text-gray-400">
+                  No attendance records found
+                </Typo>
+            )}
+            {fetchHistory?.map((record, index) => (
+              <View
+                key={index}
+                className="bg-white/10 p-4 rounded-xl border border-white/10"
+              >
+                {/* Header Row */}
+                <View className="flex-row items-center justify-between mb-3">
+                  <View className="flex-row items-center gap-3">
+                    <View className="bg-white/20 p-2 rounded-full">
                       <MaterialIcons
-                        name="location-on"
-                        size={16}
-                        color="#ffffff80"
+                        name={getHistoryStatus({status: record.status}) === HistoryStatusText.IN ? 'check-circle' : 'close'}
+                        size={20}
+                        color={getHistoryStatus({status: record.status}) === HistoryStatusText.IN ? '#4ade80' : '#eb4034'}
                       />
-                      <Typo className="text-sm text-gray-400">
-                        {location}
+                    </View>
+                    <View>
+                      <Typo className="text-white font-medium">
+                        {getHistoryStatus({status: record.status})}
                       </Typo>
-                      <View className="w-1 h-1 rounded-full bg-gray-400" />
+                      <Typo className="text-sm text-gray-400">
+                        {getTimeFormatted(record.timestamp as unknown as Timestamp)}
+                      </Typo>
                     </View>
                   </View>
-                )
-              })
-            )}
+                  <View className="bg-white/10 px-3 py-1 rounded-full">
+                    <Typo className="text-sm text-gray-400">
+                      {createdAtFormatted(record.timestamp as unknown as Timestamp)}
+                    </Typo>
+                  </View>
+                </View>
+
+                {/* Details Row */}
+                <View className="flex-row items-center gap-4 ml-12">
+                  <View className="flex-row items-center gap-2">
+                    <MaterialIcons
+                      name="location-on"
+                      size={16}
+                      color="#ffffff80"
+                    />
+                    <Typo className="text-sm text-gray-400">
+                      Main Gate
+                    </Typo>
+                  </View>
+                </View>
+              </View>
+            ))}
           </View>
         </View>
       </View>
