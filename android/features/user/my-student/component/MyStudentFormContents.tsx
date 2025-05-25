@@ -4,41 +4,46 @@ import { Student } from '@/utils/types'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import Typo from '@/components/typo'
 import { MaterialIcons } from '@expo/vector-icons'
+import { getAllHistory } from '@/api/history/getAllHistory'
+import { useQuery } from '@tanstack/react-query'
 
 interface MyStudentFormContentsProps {
   student: Student | null | undefined
 }
 
 const MyStudentFormContents = ({ student }: MyStudentFormContentsProps) => {
+  const { data = [], isLoading } = useQuery({
+    queryKey: ['history'],
+    queryFn: getAllHistory,
+    enabled: !!student,
+  })
+
   if (!student) return null
 
-  // Static attendance history data
-  const attendanceHistory = [
-    {
-      date: 'March 15, 2024',
-      time: '08:00 AM',
-      status: 'Present',
-      icon: 'check-circle',
-      color: '#4ade80',
-      location: 'Main Gate',
-    },
-    {
-      date: 'March 14, 2024',
-      time: '08:05 AM',
-      status: 'Present',
-      icon: 'check-circle',
-      color: '#4ade80',
-      location: 'Main Gate',
-    },
-    {
-      date: 'March 13, 2024',
-      time: '07:55 AM',
-      status: 'Present',
-      icon: 'check-circle',
-      color: '#4ade80',
-      location: 'Main Gate',
-    },
-  ]
+  // Filter and map the data
+  const attendanceHistory = data
+    .filter((record: any) => record.student_uid === student.id)
+    .map((record: any) => {
+      let statusText = 'Unknown'
+      if (record.status === 1) statusText = 'Present'
+      else if (record.status === 2) statusText = 'Absent'
+
+      let date = ''
+      let time = ''
+      if (record.timestamp && record.timestamp.toDate) {
+        const jsDate = record.timestamp.toDate()
+        date = jsDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
+        time = jsDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      }
+      return {
+        date,
+        time,
+        status: statusText,
+        icon: record.status === 1 ? 'check-circle' : 'cancel',
+        color: record.status === 1 ? '#4ade80' : '#f87171',
+        location: 'Main Gate',
+      }
+    })
 
   return (
     <SafeAreaView className="flex-1">
@@ -84,38 +89,42 @@ const MyStudentFormContents = ({ student }: MyStudentFormContentsProps) => {
           </View>
 
           <View className="gap-3">
-            {attendanceHistory.map((record, index) => (
-              <View
-                key={index}
-                className="bg-white/10 p-4 rounded-xl border border-white/10"
-              >
-                {/* Header Row */}
-                <View className="flex-row items-center justify-between mb-3">
-                  <View className="flex-row items-center gap-3">
-                    <View className="bg-white/20 p-2 rounded-full">
-                      <MaterialIcons
-                        name={record.icon as any}
-                        size={20}
-                        color={record.color}
-                      />
+            {isLoading ? (
+              <Typo className="text-white">Loading...</Typo>
+            ) : attendanceHistory.length === 0 ? (
+              <Typo className="text-white">No history found.</Typo>
+            ) : (
+              attendanceHistory.map((record, index) => (
+                <View
+                  key={index}
+                  className="bg-white/10 p-4 rounded-xl border border-white/10"
+                >
+                  {/* Header Row */}
+                  <View className="flex-row items-center justify-between mb-3">
+                    <View className="flex-row items-center gap-3">
+                      <View className="bg-white/20 p-2 rounded-full">
+                        <MaterialIcons
+                          name={record.icon as any}
+                          size={20}
+                          color={record.color}
+                        />
+                      </View>
+                      <View>
+                        <Typo className="text-white font-medium">
+                          {record.status}
+                        </Typo>
+                        <Typo className="text-sm text-gray-400">
+                          {record.date}
+                        </Typo>
+                      </View>
                     </View>
-                    <View>
-                      <Typo className="text-white font-medium">
-                        {record.status}
-                      </Typo>
-                      <Typo className="text-sm text-gray-400">
-                        {record.date}
-                      </Typo>
+                    <View className="bg-white/10 px-3 py-1 rounded-full">
+                      <Typo className="text-sm text-gray-400">{record.time}</Typo>
                     </View>
                   </View>
-                  <View className="bg-white/10 px-3 py-1 rounded-full">
-                    <Typo className="text-sm text-gray-400">{record.time}</Typo>
-                  </View>
-                </View>
 
-                {/* Details Row */}
-                <View className="flex-row items-center gap-4 ml-12">
-                  <View className="flex-row items-center gap-2">
+                  {/* Details Row */}
+                  <View className="flex-row items-center gap-2 ml-12">
                     <MaterialIcons
                       name="location-on"
                       size={16}
@@ -124,11 +133,11 @@ const MyStudentFormContents = ({ student }: MyStudentFormContentsProps) => {
                     <Typo className="text-sm text-gray-400">
                       {record.location}
                     </Typo>
+                    <View className="w-1 h-1 rounded-full bg-gray-400" />
                   </View>
-                  <View className="w-1 h-1 rounded-full bg-gray-400" />
                 </View>
-              </View>
-            ))}
+              ))
+            )}
           </View>
         </View>
       </View>
