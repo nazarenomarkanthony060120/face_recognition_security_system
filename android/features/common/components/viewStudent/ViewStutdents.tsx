@@ -1,4 +1,4 @@
-import { View, ScrollView } from 'react-native'
+import { View, ScrollView, ActivityIndicator } from 'react-native'
 import React from 'react'
 import { useFetchAllStudents } from '@/hooks/common/fetchStudentsById'
 import Typo from '@/components/typo'
@@ -13,27 +13,21 @@ interface ViewStutdentsProps {
 const ViewStutdents = ({ id }: ViewStutdentsProps) => {
   const { data: studentsData, isLoading } = useFetchAllStudents({ id })
 
-  // Static data for demonstration
-  const staticStudents = [
-    {
-      id: '1',
-      studentId: '2024-001',
-      name: 'John Doe',
-      gradeSection: 'Grade 10 - Section A',
-    },
-    {
-      id: '2',
-      studentId: '2024-002',
-      name: 'Jane Smith',
-      gradeSection: 'Grade 10 - Section B',
-    },
-    {
-      id: '3',
-      studentId: '2024-003',
-      name: 'Mike Johnson',
-      gradeSection: 'Grade 11 - Section A',
-    },
-  ]
+  if (isLoading) {
+    return (
+      <View className="flex-1 items-center justify-center">
+        <ActivityIndicator size="large" color="#ffffff" />
+      </View>
+    )
+  }
+
+  if (!studentsData) {
+    return (
+      <View className="flex-1 items-center justify-center">
+        <Typo className="text-white">No students found</Typo>
+      </View>
+    )
+  }
 
   return (
     <View className="mt-6">
@@ -56,7 +50,7 @@ const ViewStutdents = ({ id }: ViewStutdentsProps) => {
 
       {/* Students List */}
       <ScrollView showsVerticalScrollIndicator={false} className="gap-3">
-        {staticStudents.map((student) => (
+        {studentsData.map((student) => (
           <View
             key={student.id}
             className="bg-white/10 p-4 rounded-xl border border-white/10"
