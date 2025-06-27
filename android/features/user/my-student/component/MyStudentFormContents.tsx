@@ -16,8 +16,16 @@ interface MyStudentFormContentsProps {
 
 const MyStudentFormContents = ({ student }: MyStudentFormContentsProps) => {
   if (!student) return null
-  const { data: fetchHistory, isLoading } = fetchStudentHistoryById({id: student.id})
-  console.log('History Data:', fetchHistory)
+
+  console.log('MyStudentFormContents - Student object:', student)
+  console.log('MyStudentFormContents - Student ID being passed:', student.id)
+
+  const { data: fetchHistory, isLoading } = fetchStudentHistoryById({
+    id: student.id,
+  })
+
+  console.log('MyStudentFormContents - fetchHistory result:', fetchHistory)
+  console.log('MyStudentFormContents - isLoading:', isLoading)
 
   return (
     <SafeAreaView className="flex-1">
@@ -64,9 +72,9 @@ const MyStudentFormContents = ({ student }: MyStudentFormContentsProps) => {
 
           <View className="gap-3">
             {fetchHistory?.length === 0 && (
-                <Typo className="text-sm text-gray-400">
-                  No attendance records found
-                </Typo>
+              <Typo className="text-sm text-gray-400">
+                No attendance records found
+              </Typo>
             )}
             {fetchHistory?.map((record, index) => (
               <View
@@ -78,23 +86,37 @@ const MyStudentFormContents = ({ student }: MyStudentFormContentsProps) => {
                   <View className="flex-row items-center gap-3">
                     <View className="bg-white/20 p-2 rounded-full">
                       <MaterialIcons
-                        name={getHistoryStatus({status: record.status}) === HistoryStatusText.IN ? 'check-circle' : 'close'}
+                        name={
+                          getHistoryStatus({ status: record.status }) ===
+                          HistoryStatusText.IN
+                            ? 'check-circle'
+                            : 'close'
+                        }
                         size={20}
-                        color={getHistoryStatus({status: record.status}) === HistoryStatusText.IN ? '#4ade80' : '#eb4034'}
+                        color={
+                          getHistoryStatus({ status: record.status }) ===
+                          HistoryStatusText.IN
+                            ? '#4ade80'
+                            : '#eb4034'
+                        }
                       />
                     </View>
                     <View>
                       <Typo className="text-white font-medium">
-                        {getHistoryStatus({status: record.status})}
+                        {getHistoryStatus({ status: record.status })}
                       </Typo>
                       <Typo className="text-sm text-gray-400">
-                        {getTimeFormatted(record.timestamp as unknown as Timestamp)}
+                        {getTimeFormatted(
+                          record.timestamp as unknown as Timestamp,
+                        )}
                       </Typo>
                     </View>
                   </View>
                   <View className="bg-white/10 px-3 py-1 rounded-full">
                     <Typo className="text-sm text-gray-400">
-                      {createdAtFormatted(record.timestamp as unknown as Timestamp)}
+                      {createdAtFormatted(
+                        record.timestamp as unknown as Timestamp,
+                      )}
                     </Typo>
                   </View>
                 </View>
@@ -107,9 +129,7 @@ const MyStudentFormContents = ({ student }: MyStudentFormContentsProps) => {
                       size={16}
                       color="#ffffff80"
                     />
-                    <Typo className="text-sm text-gray-400">
-                      Main Gate
-                    </Typo>
+                    <Typo className="text-sm text-gray-400">Main Gate</Typo>
                   </View>
                 </View>
               </View>
