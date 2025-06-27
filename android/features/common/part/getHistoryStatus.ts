@@ -1,16 +1,16 @@
-import { HistoryStatus, HistoryStatusText } from "@/utils/types"
+import { HistoryStatus, HistoryStatusText } from '@/utils/types'
 
 type GetHistoryStatusType = {
-    status: HistoryStatus
+  status: HistoryStatus
 }
 
 export const getHistoryStatus = ({ status }: GetHistoryStatusType) => {
-    switch (status) {
-        case HistoryStatus.IN:
-            return HistoryStatusText.IN
-        case HistoryStatus.OUT:
-            return HistoryStatusText.OUT
-        default:
-            return HistoryStatusText.UNKNOWN
-    }
+  switch (status) {
+    case HistoryStatus.IN:
+      return HistoryStatusText.IN
+    case HistoryStatus.OUT:
+      return HistoryStatusText.OUT
+    default:
+      return HistoryStatusText.UNKNOWN
+  }
 }

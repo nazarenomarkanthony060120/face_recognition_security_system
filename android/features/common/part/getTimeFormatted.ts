@@ -7,7 +7,7 @@ export const getTimeFormatted = (createdAt: Timestamp | null | undefined) => {
     return date.toLocaleTimeString('en-US', {
       hour: '2-digit',
       minute: '2-digit',
-      hour12: true
+      hour12: true,
     })
   } catch (error) {
     console.error('Error formatting time:', error)

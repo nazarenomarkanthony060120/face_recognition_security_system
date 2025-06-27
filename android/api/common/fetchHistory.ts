@@ -8,11 +8,14 @@ export const fetchHistory = async ({ id }: UserIdRequest) => {
     const q = query(
       collection(db, 'history'),
       where('student_uid', '==', id),
-      orderBy('timestamp', 'desc')
+      orderBy('timestamp', 'desc'),
     )
     console.log('testing ni - about to query with orderBy')
     const snapshot = await getDocs(q)
-    console.log('Query with orderBy successful, snapshot.empty:', snapshot.empty)
+    console.log(
+      'Query with orderBy successful, snapshot.empty:',
+      snapshot.empty,
+    )
     console.log('Number of docs found:', snapshot.docs.length)
 
     if (!snapshot.empty) {
@@ -30,12 +33,12 @@ export const fetchHistory = async ({ id }: UserIdRequest) => {
     return []
   } catch (error) {
     // If composite index doesn't exist, fall back to query without orderBy
-    console.log('Composite index required, falling back to client-side sorting:', error)
-
-    const q = query(
-      collection(db, 'history'),
-      where('student_uid', '==', id)
+    console.log(
+      'Composite index required, falling back to client-side sorting:',
+      error,
     )
+
+    const q = query(collection(db, 'history'), where('student_uid', '==', id))
 
     console.log('Trying fallback query without orderBy')
     const snapshot = await getDocs(q)
@@ -58,8 +61,10 @@ export const fetchHistory = async ({ id }: UserIdRequest) => {
 
       // Sort by timestamp on client side
       const sortedData = historyData.sort((a, b) => {
-        const timestampA = (a.timestamp as any)?.toDate?.() || new Date(a.timestamp as any)
-        const timestampB = (b.timestamp as any)?.toDate?.() || new Date(b.timestamp as any)
+        const timestampA =
+          (a.timestamp as any)?.toDate?.() || new Date(a.timestamp as any)
+        const timestampB =
+          (b.timestamp as any)?.toDate?.() || new Date(b.timestamp as any)
         return timestampB.getTime() - timestampA.getTime()
       })
 

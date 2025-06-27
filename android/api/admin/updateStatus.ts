@@ -11,7 +11,10 @@ export const updateStatus = async ({ id }: UserIdRequest) => {
     throw new Error('User not found')
   }
 
-  const status = docSnap.data().status === UserStatusDB.ACTIVE ? UserStatusDB.INACTIVE : UserStatusDB.ACTIVE
+  const status =
+    docSnap.data().status === UserStatusDB.ACTIVE
+      ? UserStatusDB.INACTIVE
+      : UserStatusDB.ACTIVE
 
   await updateDoc(docRef, {
     status: status,

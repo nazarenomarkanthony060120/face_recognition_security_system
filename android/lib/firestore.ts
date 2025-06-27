@@ -17,7 +17,7 @@ import {
   getDocs,
   query,
   where,
-  updateDoc
+  updateDoc,
 } from 'firebase/firestore'
 
 const firebaseConfig = {
@@ -51,5 +51,5 @@ export {
   getDocs,
   query,
   where,
-  updateDoc
+  updateDoc,
 }
