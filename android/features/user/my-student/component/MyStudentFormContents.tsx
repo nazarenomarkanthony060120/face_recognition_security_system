@@ -1,5 +1,5 @@
-import { View } from 'react-native'
-import React from 'react'
+import { View, TouchableOpacity } from 'react-native'
+import React, { useState } from 'react'
 import { HistoryStatusText, Student } from '@/utils/types'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import Typo from '@/components/typo'
@@ -17,15 +17,38 @@ interface MyStudentFormContentsProps {
 const MyStudentFormContents = ({ student }: MyStudentFormContentsProps) => {
   if (!student) return null
 
-  console.log('MyStudentFormContents - Student object:', student)
-  console.log('MyStudentFormContents - Student ID being passed:', student.id)
-
   const { data: fetchHistory, isLoading } = fetchStudentHistoryById({
     id: student.id,
   })
 
-  console.log('MyStudentFormContents - fetchHistory result:', fetchHistory)
-  console.log('MyStudentFormContents - isLoading:', isLoading)
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1)
+  const [itemsPerPage, setItemsPerPage] = useState(10)
+
+  // Calculate pagination
+  const totalItems = fetchHistory?.length || 0
+  const totalPages = Math.ceil(totalItems / itemsPerPage)
+  const startIndex = (currentPage - 1) * itemsPerPage
+  const endIndex = startIndex + itemsPerPage
+  const currentItems = fetchHistory?.slice(startIndex, endIndex) || []
+
+  // Navigation functions
+  const goToNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1)
+    }
+  }
+
+  const goToPrevPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1)
+    }
+  }
+
+  const changeItemsPerPage = (newItemsPerPage: number) => {
+    setItemsPerPage(newItemsPerPage)
+    setCurrentPage(1) // Reset to first page when changing items per page
+  }
 
   return (
     <SafeAreaView className="flex-1">
@@ -76,7 +99,7 @@ const MyStudentFormContents = ({ student }: MyStudentFormContentsProps) => {
                 No attendance records found
               </Typo>
             )}
-            {fetchHistory?.map((record, index) => (
+            {currentItems.map((record, index) => (
               <View
                 key={index}
                 className="bg-white/10 p-4 rounded-xl border border-white/10"
@@ -89,8 +112,8 @@ const MyStudentFormContents = ({ student }: MyStudentFormContentsProps) => {
                         name={
                           getHistoryStatus({ status: record.status }) ===
                           HistoryStatusText.IN
-                            ? 'check-circle'
-                            : 'close'
+                            ? 'login'
+                            : 'logout'
                         }
                         size={20}
                         color={
@@ -105,7 +128,7 @@ const MyStudentFormContents = ({ student }: MyStudentFormContentsProps) => {
                       <Typo className="text-white font-medium">
                         {getHistoryStatus({ status: record.status })}
                       </Typo>
-                      <Typo className="text-sm text-gray-400">
+                      <Typo className="text-sm text-white">
                         {getTimeFormatted(
                           record.timestamp as unknown as Timestamp,
                         )}
@@ -113,7 +136,7 @@ const MyStudentFormContents = ({ student }: MyStudentFormContentsProps) => {
                     </View>
                   </View>
                   <View className="bg-white/10 px-3 py-1 rounded-full">
-                    <Typo className="text-sm text-gray-400">
+                    <Typo className="text-sm text-white">
                       {createdAtFormatted(
                         record.timestamp as unknown as Timestamp,
                       )}
@@ -129,11 +152,117 @@ const MyStudentFormContents = ({ student }: MyStudentFormContentsProps) => {
                       size={16}
                       color="#ffffff80"
                     />
-                    <Typo className="text-sm text-gray-400">Main Gate</Typo>
+                    <Typo className="text-sm text-white/80">Main Gate</Typo>
                   </View>
                 </View>
               </View>
             ))}
+
+            {/* Pagination Controls */}
+            {fetchHistory && fetchHistory.length > 0 && (
+              <View className="mt-6">
+                {/* Items per page selector */}
+                <View className="flex-col items-start justify-between mb-4">
+                  <View className="flex-row items-center gap-2">
+                    <Typo className="text-sm text-gray-400">Show:</Typo>
+                    <View className="flex-row bg-white/10 rounded-lg border border-white/10">
+                      {[10, 20, 30].map((size) => (
+                        <TouchableOpacity
+                          key={size}
+                          className={`px-3 py-1 ${
+                            itemsPerPage === size
+                              ? 'bg-white/20'
+                              : 'bg-transparent'
+                          }`}
+                          onPress={() => changeItemsPerPage(size)}
+                        >
+                          <Typo
+                            className={`text-sm ${
+                              itemsPerPage === size
+                                ? 'text-white'
+                                : 'text-gray-400'
+                            }`}
+                          >
+                            {size}
+                          </Typo>
+                        </TouchableOpacity>
+                      ))}
+                    </View>
+                  </View>
+                  <Typo className="text-sm text-gray-400">
+                    {startIndex + 1}-{Math.min(endIndex, totalItems)} of{' '}
+                    {totalItems} records
+                  </Typo>
+                </View>
+
+                {/* Navigation buttons */}
+                <View className="flex-row items-center justify-between">
+                  <TouchableOpacity
+                    className="flex-row items-center gap-2"
+                    onPress={goToPrevPage}
+                    disabled={currentPage <= 1}
+                  >
+                    <View
+                      className={`p-2 rounded-lg border ${
+                        currentPage > 1
+                          ? 'bg-white/10 border-white/10'
+                          : 'bg-white/5 border-white/5'
+                      }`}
+                    >
+                      <MaterialIcons
+                        name="chevron-left"
+                        size={20}
+                        color={currentPage > 1 ? '#ffffff' : '#ffffff40'}
+                      />
+                    </View>
+                    <Typo
+                      className={`text-sm ${
+                        currentPage > 1 ? 'text-white' : 'text-gray-800'
+                      }`}
+                    >
+                      Previous
+                    </Typo>
+                  </TouchableOpacity>
+
+                  <View className="flex-row items-center gap-2">
+                    <Typo className="text-sm text-gray-400">
+                      Page {currentPage} of {totalPages}
+                    </Typo>
+                  </View>
+
+                  <TouchableOpacity
+                    className="flex-row items-center gap-2"
+                    onPress={goToNextPage}
+                    disabled={currentPage >= totalPages}
+                  >
+                    <Typo
+                      className={`text-sm ${
+                        currentPage < totalPages
+                          ? 'text-white'
+                          : 'text-gray-800'
+                      }`}
+                    >
+                      Next
+                    </Typo>
+                    <View
+                      className={`p-2 rounded-lg border ${
+                        currentPage < totalPages
+                          ? 'bg-white/10 border-white/10'
+                          : 'bg-white/5 border-white/5'
+                      }`}
+                    >
+                      <MaterialIcons
+                        name="chevron-right"
+                        size={20}
+                        color={
+                          currentPage < totalPages ? '#ffffff' : '#ffffff40'
+                        }
+                      />
+                    </View>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            )}
           </View>
         </View>
       </View>

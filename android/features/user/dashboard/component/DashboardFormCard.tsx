@@ -14,9 +14,9 @@ const DashboardFormCard = () => {
             <MaterialIcons name="school" size={24} color="#ffffff" />
           </View>
           <View>
-            <Typo className="text-xl text-white font-bold">Student List</Typo>
+            <Typo className="text-xl text-white font-bold">Boarder Lists</Typo>
             <Typo className="text-gray-400 text-sm">
-              View and manage your students
+              View and manage your boarders
             </Typo>
           </View>
         </View>
