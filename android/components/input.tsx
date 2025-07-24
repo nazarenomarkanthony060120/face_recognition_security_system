@@ -37,6 +37,7 @@ const Input = ({
   error,
   multiline = false,
   numberOfLines = 1,
+  keyboardType = 'default',
   editable = true,
 }: InputProps) => {
   const [isPasswordVisible, setIsPasswordVisible] = useState<boolean>(false)
@@ -49,6 +50,7 @@ const Input = ({
           className={`flex-1 py-4 ${isIconLeft ? 'pl-0' : 'pl-4'} ${isIconRight ? 'pr-0' : 'pr-4'} ${className}`}
           placeholder={placeholder}
           placeholderTextColor="#9ca3af"
+          keyboardType={keyboardType}
           secureTextEntry={isPassword ? !isPasswordVisible : secureTextEntry}
           value={value}
           onChangeText={onChangeText}

@@ -22,10 +22,10 @@ const MyStudentFormCard = ({ student }: MyStudentFormCardProps) => {
           </View>
           <View>
             <Typo className="text-xl text-white font-bold">
-              Student Details
+              Boarder Details
             </Typo>
             <Typo className="text-gray-400 text-sm">
-              View student information and history
+              View boarder information and history
             </Typo>
           </View>
         </View>

@@ -62,7 +62,8 @@ export type Student = {
   studentId: string
   parentId: string
   name: string
-  gradeSection: string
+  address: string
+  contactNumber: string
   createdAt: FieldValue
   updatedAt: FieldValue
 }
@@ -71,8 +72,8 @@ export type AddStudent = {
   id: string
   studentId: string
   name: string
-  gradeSection: string
-}
+  contactNumber: string
+  address: string}
 
 export enum HistoryStatusText {
   IN = 'In',

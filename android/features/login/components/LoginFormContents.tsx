@@ -32,6 +32,7 @@ const LoginFormContents = ({ control }: LoginFormContentsProps) => {
               onChangeText={onChange}
               secureTextEntry={false}
               isIconLeft
+              keyboardType="email-address"
               icon={
                 <MaterialIcons
                   name="alternate-email"

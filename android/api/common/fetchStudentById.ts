@@ -21,6 +21,8 @@ export const fetchStudentById = async ({ id }: UserIdRequest) => {
       studentId: docSnap.data().studentId,
       parentId: docSnap.data().parentId,
       name: docSnap.data().name,
+      address: docSnap.data().address,
+      contactNumber: docSnap.data().contactNumber,
       gradeSection: docSnap.data().gradeSection,
       createdAt: docSnap.data().createdAt,
       updatedAt: docSnap.data().updatedAt,

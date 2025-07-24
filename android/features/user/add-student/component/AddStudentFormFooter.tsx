@@ -29,7 +29,7 @@ const AddStudentFormFooter = ({
         <Button className="bg-white/10 items-center rounded-xl p-4 border border-white/10">
           <View className="flex-row items-center gap-2">
             <ActivityIndicator color="#ffffff" />
-            <Typo className="text-white">Adding Student...</Typo>
+            <Typo className="text-white">Adding Boarder...</Typo>
           </View>
         </Button>
       </SafeAreaView>
@@ -45,7 +45,7 @@ const AddStudentFormFooter = ({
       >
         <View className="flex-row items-center gap-2">
           <MaterialIcons name="person-add" size={20} color="#ffffff" />
-          <Typo className="text-white">Add Student</Typo>
+          <Typo className="text-white">Add Boarder</Typo>
         </View>
       </Button>
     </SafeAreaView>

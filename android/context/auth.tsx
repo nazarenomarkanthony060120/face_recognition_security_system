@@ -21,12 +21,26 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const router = useRouter()
 
   useEffect(() => {
-    if (!auth) return
-
-    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
-      setUser(firebaseUser)
+    if (!auth) {
       setLoading(false)
-    })
+      return
+    }
+
+    const unsubscribe = onAuthStateChanged(
+      auth,
+      (firebaseUser) => {
+        console.log(
+          'Auth state changed:',
+          firebaseUser ? 'User logged in' : 'User logged out',
+        )
+        setUser(firebaseUser)
+        setLoading(false)
+      },
+      (error) => {
+        console.error('Auth state change error:', error)
+        setLoading(false)
+      },
+    )
 
     return () => unsubscribe()
   }, [])
@@ -34,9 +48,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const logout = async () => {
     try {
       await signOut(auth)
+      // The onAuthStateChanged will handle the state update
       router.replace('/(auth)/login')
     } catch (error) {
       console.error('Logout error:', error)
+      throw error
     }
   }
 

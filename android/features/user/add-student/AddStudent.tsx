@@ -13,10 +13,10 @@ const AddStudent = () => {
       end={{ x: 1, y: 1 }}
       className="flex-1"
     >
-      <User className="flex-1 justify-between p-5">
+      <User className="flex-1 p-5">
         <AddStudentHeader />
         <AddStudentFormCard />
-        <AddStudentFooter />
+        {/* <AddStudentFooter /> */}
       </User>
     </LinearGradient>
   )

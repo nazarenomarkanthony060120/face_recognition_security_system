@@ -1,4 +1,4 @@
-import { ScrollView, View } from 'react-native'
+import { View } from 'react-native'
 import React from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import DashboardFormContents from './DashboardFormContents'
@@ -20,11 +20,11 @@ const DashboardFormCard = () => {
             </Typo>
           </View>
         </View>
-        <ScrollView showsVerticalScrollIndicator={false}>
-          <SafeAreaView className="gap-2">
+        <View className="flex-1">
+          <SafeAreaView className="gap-2 flex-1">
             <DashboardFormContents />
           </SafeAreaView>
-        </ScrollView>
+        </View>
       </View>
     </View>
   )

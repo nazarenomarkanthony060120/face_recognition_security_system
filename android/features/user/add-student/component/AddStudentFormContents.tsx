@@ -26,11 +26,12 @@ const AddStudentFormContents = ({ control }: AddStudentFormContentsProps) => {
           }}
           render={({ field: { onChange, value } }) => (
             <Input
-              className="w-full py-3 bg-white/10 border border-white/10 rounded-xl"
-              placeholder="Enter student ID"
+              className="w-full text-white py-3 bg-white/10 border border-white/10 rounded-xl"
+              placeholder="Enter ID"
               placeholderTextColor="#ffffff80"
               value={value}
               onChangeText={onChange}
+              keyboardType='number-pad'
               secureTextEntry={false}
               isIconLeft
               icon={<AntDesign name="idcard" size={20} color="#ffffff" />}
@@ -53,14 +54,69 @@ const AddStudentFormContents = ({ control }: AddStudentFormContentsProps) => {
           }}
           render={({ field: { onChange, value } }) => (
             <Input
-              className="w-full py-3 bg-white/10 border border-white/10 rounded-xl"
-              placeholder="Enter student's full name"
+              className="w-full text-white py-3 bg-white/10 border border-white/10 rounded-xl"
+              placeholder="Enter full name"
               placeholderTextColor="#ffffff80"
               value={value}
               onChangeText={onChange}
               secureTextEntry={false}
               isIconLeft
               icon={<AntDesign name="user" size={20} color="#ffffff" />}
+            />
+          )}
+        />
+      </View>
+
+      <View>
+        <Typo className="text-white mb-2">Contact Number</Typo>
+        <Controller
+          control={control}
+          name="contactNumber"
+          rules={{
+            required: 'Contact Number is required',
+            minLength: {
+              value: 5,
+              message: 'Contact Number must be at least 5 characters',
+            },
+          }}
+          render={({ field: { onChange, value } }) => (
+            <Input
+              className="w-full text-white py-3 bg-white/10 border border-white/10 rounded-xl"
+              placeholder="Enter contact number"
+              placeholderTextColor="#ffffff80"
+              keyboardType='number-pad'
+              value={value}
+              onChangeText={onChange}
+              secureTextEntry={false}
+              isIconLeft
+              icon={<AntDesign name="phone" size={20} color="#ffffff" />}
+            />
+          )}
+        />
+      </View>
+
+      <View>
+        <Typo className="text-white mb-2">Resident Address</Typo>
+        <Controller
+          control={control}
+          name="address"
+          rules={{
+            required: 'Resident Address is required',
+            minLength: {
+              value: 5,
+              message: 'Resident Address must be at least 5 characters',
+            },
+          }}
+          render={({ field: { onChange, value } }) => (
+            <Input
+              className="w-full text-white py-3 bg-white/10 border border-white/10 rounded-xl"
+              placeholder="Enter resident address"
+              placeholderTextColor="#ffffff80"
+              value={value}
+              onChangeText={onChange}
+              secureTextEntry={false}
+              isIconLeft
+              icon={<AntDesign name="home" size={20} color="#ffffff" />}
             />
           )}
         />

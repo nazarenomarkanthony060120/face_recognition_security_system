@@ -65,14 +65,28 @@ const MyStudentFormContents = ({ student }: MyStudentFormContentsProps) => {
 
         <View className="flex-row items-center gap-4 mb-6">
           <View className="bg-white/20 p-3 rounded-full">
-            <MaterialIcons name="school" size={24} color="#ffffff" />
+            <MaterialIcons name="phone" size={24} color="#ffffff" />
           </View>
           <View>
             <Typo className="text-lg font-bold text-white">
-              Grade & Section
+              Contact Number
             </Typo>
             <Typo className="text-sm text-gray-400">
-              {student.gradeSection}
+              {student.contactNumber}
+            </Typo>
+          </View>
+        </View>
+
+        <View className="flex-row items-center gap-4 mb-6">
+          <View className="bg-white/20 p-3 rounded-full">
+            <MaterialIcons name="home" size={24} color="#ffffff" />
+          </View>
+          <View>
+            <Typo className="text-lg font-bold text-white">
+              Resident Address
+            </Typo>
+            <Typo className="text-sm text-gray-400">
+              {student.address}
             </Typo>
           </View>
         </View>

@@ -104,7 +104,7 @@ const DashboardHeader = () => {
           onPress={() => setShowSearch(false)}
         >
           <View className="flex-row items-center justify-between mb-2">
-            <Typo className="text-gray-400">Total Students</Typo>
+            <Typo className="text-gray-400">Total Boarders</Typo>
             <MaterialIcons name="people" size={20} color="#ffffff80" />
           </View>
           {isLoading ? (
@@ -115,7 +115,7 @@ const DashboardHeader = () => {
                 {stats.total}
               </Typo>
               <Typo className="text-xs text-gray-400 mt-1">
-                {stats.total === 1 ? 'Enrolled student' : 'Enrolled students'}
+                {stats.total === 1 ? 'Enrolled boarder' : 'Enrolled boarders'}
               </Typo>
             </>
           )}

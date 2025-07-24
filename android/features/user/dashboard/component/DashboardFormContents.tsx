@@ -22,8 +22,7 @@ const DashboardFormContents = () => {
     return students.filter(
       (student) =>
         student.name.toLowerCase().includes(query) ||
-        student.studentId.toLowerCase().includes(query) ||
-        student.gradeSection.toLowerCase().includes(query),
+        student.studentId.toLowerCase().includes(query) 
     )
   }, [students, searchQuery])
 

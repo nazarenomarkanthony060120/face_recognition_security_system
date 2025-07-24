@@ -1,7 +1,6 @@
 import { ScrollView, View } from 'react-native'
 import React, { useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import AddStudentFormHeader from './AddStudentFormHeader'
 import AddStudentFormContents from './AddStudentFormContents'
 import { FieldValues, SubmitHandler, useForm } from 'react-hook-form'
 import AddStudentFormFooter from './AddStudentFormFooter'
@@ -32,7 +31,8 @@ const AddStudentFormCard = () => {
       id: auth.user?.uid,
       studentId: data.studentId,
       name: data.name,
-      gradeSection: data.gradeSection,
+      contactNumber: data.contactNumber,
+      address: data.address,
     }
 
     addStudent(formData as AddStudent, {
@@ -56,10 +56,10 @@ const AddStudentFormCard = () => {
           </View>
           <View>
             <Typo className="text-xl text-white font-bold">
-              Add New Student
+              Add New Boarder
             </Typo>
             <Typo className="text-gray-400 text-sm">
-              Fill in the student details below
+              Fill in the Boarder details below
             </Typo>
           </View>
         </View>
@@ -69,7 +69,7 @@ const AddStudentFormCard = () => {
             {showCountdown && (
               <CountDown
                 time={5}
-                route={'/screens/(user)/dashboard'}
+                route={'/screens/(user)/dashboard/dashboard'}
                 message="You will be redirected to Dashboard in"
                 setShowCountdown={setShowCountdown}
               />

@@ -8,16 +8,39 @@ import React, { useEffect, useState } from 'react'
 import { View, ActivityIndicator, ScrollView } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { LinearGradient } from 'expo-linear-gradient'
+import { useAuth } from '@/context/auth'
+import { useFetchUserById } from '@/hooks/common/fetchUserById'
+import { getUserRoutes } from '@/features/common/part/getUserRoutes'
 
 const index = () => {
   const router = useRouter()
+  const { user, loading } = useAuth()
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<Error | null>(null)
+
+  // Fetch user data only if user is authenticated
+  const { data: userData, isLoading: userDataLoading } = useFetchUserById({
+    id: user?.uid,
+  })
 
   useEffect(() => {
     const initializeApp = async () => {
       try {
-        setIsLoading(false)
+        // Wait for auth to finish loading
+        if (loading) return
+
+        // If user is authenticated, get their type and redirect to appropriate dashboard
+        if (user) {
+          // Wait for user data to load to determine user type
+          if (!userDataLoading && userData) {
+            const route = getUserRoutes({ type: userData.type })
+            router.replace(route)
+            return
+          }
+        } else {
+          // User is not authenticated, show splash screen
+          setIsLoading(false)
+        }
       } catch (err) {
         setError(
           err instanceof Error ? err : new Error('Failed to initialize app'),
@@ -27,7 +50,7 @@ const index = () => {
     }
 
     initializeApp()
-  }, [])
+  }, [user, loading, userData, userDataLoading, router])
 
   const navigateToLogin = () => {
     try {
@@ -37,10 +60,12 @@ const index = () => {
     }
   }
 
-  if (isLoading) {
+  // Show loading while auth is initializing or user data is loading
+  if (loading || (user && userDataLoading) || isLoading) {
     return (
       <SafeAreaView className="flex-1 bg-slate-800 items-center justify-center">
         <ActivityIndicator size="large" color="#ffffff" />
+        <Typo className="text-white mt-4">Loading...</Typo>
       </SafeAreaView>
     )
   }
@@ -61,6 +86,7 @@ const index = () => {
     )
   }
 
+  // Only show splash screen for unauthenticated users
   return (
     <LinearGradient
       colors={['#1e3a8a', '#7c3aed']}

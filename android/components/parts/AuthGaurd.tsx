@@ -13,7 +13,7 @@ export const AuthGuard = ({ children }: AuthGuardProps) => {
 
   useEffect(() => {
     if (!loading && !user) {
-      router.replace('/')
+      router.replace('/(auth)/login')
     }
   }, [user, loading, router])
 
