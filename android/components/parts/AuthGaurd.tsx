@@ -4,7 +4,7 @@ import { useRouter } from 'expo-router'
 import LoadingIndicator from '@/features/common/components/loadingIndicator/LoadingIndicator'
 
 interface AuthGuardProps {
-  children: React.ReactNode
+  children?: React.ReactNode
 }
 
 export const AuthGuard = ({ children }: AuthGuardProps) => {

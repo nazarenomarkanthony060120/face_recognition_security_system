@@ -1,4 +1,4 @@
-import { View, TouchableOpacity } from 'react-native'
+import { View, TouchableOpacity, Text } from 'react-native'
 import React from 'react'
 import { Student } from '@/utils/types'
 import { useRouter } from 'expo-router'
@@ -34,16 +34,21 @@ const ViewLists = ({ student }: ViewListsProps) => {
           />
         </View>
         <View className="flex-1">
-          <Typo className="text-lg font-bold text-white">{student.name}</Typo>
-          <Typo className="text-sm text-gray-400 mb-1">
-            {student.studentId}
-          </Typo>
+          <Text className="text-lg font-bold text-white">{student.name}</Text>
           <View className="flex-row items-center">
-            <MaterialIcons name="school" size={16} color="#ffffff80" />
-            <Typo className="text-sm text-gray-400 ml-2">
-              {student.gradeSection}
-            </Typo>
+            <MaterialIcons name="person" size={16} color="#ffffff80" />
+            <Text className="text-sm text-gray-400 ml-2">
+              {student.studentId}
+            </Text>
           </View>
+          {student.address && (
+            <View className="flex-row items-center">
+              <MaterialIcons name="home" size={16} color="#ffffff80" />
+              <Text className="text-sm text-gray-400 ml-2">
+                {student.address}
+              </Text>
+            </View>
+          )}
         </View>
         <MaterialIcons name="chevron-right" size={24} color="#ffffff80" />
       </View>

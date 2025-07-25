@@ -13,7 +13,7 @@ interface CustomButtonProps extends TouchableOpacityProps {
   icon?: React.ReactNode
   onPress?: () => void
   loading?: boolean
-  children: React.ReactNode
+  children?: React.ReactNode
   className?: string
 }
 

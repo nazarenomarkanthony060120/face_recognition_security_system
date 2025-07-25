@@ -6,7 +6,7 @@ type TypoProps = {
   size?: number
   color?: string
   fontWeight?: TextStyle['fontWeight']
-  children: any | null
+  children?: any | null
   style?: TextStyle
   textProps?: TextProps
   className?: string

@@ -30,7 +30,7 @@ const MyStudent = ({ params }: MyStudentProps) => {
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{ paddingBottom: 40 }}
         >
-          <MyStudentHeader />
+          <MyStudentHeader student={student} />
           <MyStudentFormCard student={student} />
         </ScrollView>
       </User>

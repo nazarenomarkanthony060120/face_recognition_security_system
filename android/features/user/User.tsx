@@ -2,7 +2,7 @@ import React from 'react'
 import UserLayout from './common/UserLayout'
 
 interface UserProps {
-  children: React.ReactNode
+  children?: React.ReactNode
   className: string
 }
 

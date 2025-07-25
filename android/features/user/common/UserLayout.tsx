@@ -3,7 +3,7 @@ import React from 'react'
 import ScreenLayout from '@/features/common/components/screenLayout/ScreenLayout'
 
 interface UserLayoutProps {
-  children: React.ReactNode
+  children?: React.ReactNode
   className: string
 }
 const UserLayout = ({ children, className }: UserLayoutProps) => {
