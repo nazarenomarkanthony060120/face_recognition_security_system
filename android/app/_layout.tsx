@@ -8,6 +8,7 @@ import { StatusBar } from 'react-native'
 import { verifyInstallation } from 'nativewind'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import { useSessionExtension } from '../hooks/common/useSessionExtension'
+import * as Sentry from '@sentry/react-native'
 
 const client = new QueryClient()
 
@@ -33,4 +34,4 @@ const RootLayout = () => {
   )
 }
 
-export default RootLayout
+export default Sentry.wrap(RootLayout);
