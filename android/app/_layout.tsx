@@ -7,8 +7,15 @@ import { AuthProvider } from '../context/auth'
 import { StatusBar } from 'react-native'
 import { verifyInstallation } from 'nativewind'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
+import { useSessionExtension } from '../hooks/common/useSessionExtension'
 
 const client = new QueryClient()
+
+// Component to handle session extension
+const SessionManager = ({ children }: { children: React.ReactNode }) => {
+  useSessionExtension()
+  return <>{children}</>
+}
 
 const RootLayout = () => {
   verifyInstallation()
@@ -16,8 +23,10 @@ const RootLayout = () => {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <QueryClientProvider client={client}>
         <AuthProvider>
-          <Stack screenOptions={{ headerShown: false }} />
-          <StatusBar backgroundColor="black"></StatusBar>
+          <SessionManager>
+            <Stack screenOptions={{ headerShown: false }} />
+            <StatusBar backgroundColor="black"></StatusBar>
+          </SessionManager>
         </AuthProvider>
       </QueryClientProvider>
     </GestureHandlerRootView>

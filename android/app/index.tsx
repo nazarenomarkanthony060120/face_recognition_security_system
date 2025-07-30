@@ -14,7 +14,7 @@ import { getUserRoutes } from '@/features/common/part/getUserRoutes'
 
 const index = () => {
   const router = useRouter()
-  const { user, loading } = useAuth()
+  const { user, loading, isVerified, authSession } = useAuth()
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<Error | null>(null)
 
@@ -29,19 +29,38 @@ const index = () => {
         // Wait for auth to finish loading
         if (loading) return
 
-        // If user is authenticated, get their type and redirect to appropriate dashboard
-        if (user) {
-          // Wait for user data to load to determine user type
-          if (!userDataLoading && userData) {
-            const route = getUserRoutes({ type: userData.type })
-            router.replace(route)
-            return
-          }
-        } else {
-          // User is not authenticated, show splash screen
+        console.log('App initialization:', {
+          hasUser: !!user,
+          isVerified,
+          hasAuthSession: !!authSession,
+          userDataLoading,
+          hasUserData: !!userData,
+        })
+
+        // Check for auto login: user must be both authenticated AND verified
+        if (user && isVerified && authSession && authSession.userType) {
+          // Use stored user type from auth session for faster routing
+          const route = getUserRoutes({ type: authSession.userType as any })
+          console.log('Auto login: redirecting to', route)
+          router.replace(route)
+          return
+        }
+
+        // If user is authenticated but not verified, redirect to login (session expired)
+        if (user && !isVerified) {
+          console.log('User authenticated but not verified, clearing session')
+          // The auth context will handle clearing the session
+          setIsLoading(false)
+          return
+        }
+
+        // User is not authenticated, show splash screen
+        if (!user) {
+          console.log('No authenticated user, showing splash screen')
           setIsLoading(false)
         }
       } catch (err) {
+        console.error('App initialization error:', err)
         setError(
           err instanceof Error ? err : new Error('Failed to initialize app'),
         )
@@ -50,7 +69,15 @@ const index = () => {
     }
 
     initializeApp()
-  }, [user, loading, userData, userDataLoading, router])
+  }, [
+    user,
+    loading,
+    isVerified,
+    authSession,
+    userData,
+    userDataLoading,
+    router,
+  ])
 
   const navigateToLogin = () => {
     try {
@@ -60,12 +87,14 @@ const index = () => {
     }
   }
 
-  // Show loading while auth is initializing or user data is loading
-  if (loading || (user && userDataLoading) || isLoading) {
+  // Show loading while auth is initializing, checking verification status, or user data is loading
+  if (loading || isLoading) {
     return (
       <SafeAreaView className="flex-1 bg-slate-800 items-center justify-center">
         <ActivityIndicator size="large" color="#ffffff" />
-        <Typo className="text-white mt-4">Loading...</Typo>
+        <Typo className="text-white mt-4">
+          {loading ? 'Checking login status...' : 'Loading...'}
+        </Typo>
       </SafeAreaView>
     )
   }

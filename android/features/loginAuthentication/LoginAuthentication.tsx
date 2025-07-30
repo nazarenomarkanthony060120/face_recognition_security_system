@@ -5,6 +5,7 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import { getUserRoutes } from '@/features/common/part/getUserRoutes'
 import { UserType } from '@/utils/types'
 import { sendOTP, verifyOTP } from '@/api/otp'
+import { useAuth } from '@/context/auth'
 import * as Notifications from 'expo-notifications'
 import * as Device from 'expo-device'
 import { Header } from './components/Header'
@@ -33,6 +34,7 @@ const LoginAuthentication = ({ params }: LoginAuthenticationProps) => {
   const [canResend, setCanResend] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
+  const { setUserVerified } = useAuth()
   const phoneNumber = params.get('phoneNumber')
   const type = params.get('type') as UserType
   const notificationListener = useRef<Notifications.Subscription>()
@@ -173,6 +175,12 @@ const LoginAuthentication = ({ params }: LoginAuthenticationProps) => {
       const result = await verifyOTP({ phoneNumber, otp: trimmedOTP })
       console.log('OTP verification successful:', result)
 
+      // Mark user as verified in secure storage
+      if (setUserVerified) {
+        await setUserVerified(type)
+        console.log('User verification status saved')
+      }
+
       // Send success notification
       await sendLocalNotification(
         'Verification Successful',
@@ -181,7 +189,7 @@ const LoginAuthentication = ({ params }: LoginAuthenticationProps) => {
 
       // If verification is successful, navigate to the appropriate screen based on user type
       const route = getUserRoutes({ type: type })
-      router.push(route)
+      router.replace(route) // Use replace to prevent going back to OTP screen
     } catch (error) {
       console.error('OTP verification error:', error)
 
