@@ -2,7 +2,7 @@ import React, { createContext, useState, useEffect, useContext } from 'react'
 import { auth, onAuthStateChanged, User } from '@/lib/firestore'
 import { signOut } from 'firebase/auth'
 import { useRouter } from 'expo-router'
-import { hybridStorage, AuthSession } from '@/lib/hybridStorage'
+import { asyncStorage, AuthSession } from '@/lib/asyncStorage'
 
 type ContextProps = {
   user: User | null
@@ -31,8 +31,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   const checkAuthStatus = async () => {
     try {
-      console.log('🔍 Checking auth status from hybrid storage...')
-      const session = await hybridStorage.getAuthSession()
+      console.log('🔍 Checking auth status from AsyncStorage...')
+      const session = await asyncStorage.getAuthSession()
       console.log('📦 Retrieved session:', {
         hasSession: !!session,
         isVerified: session?.isVerified,
@@ -58,8 +58,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   const setUserVerified = async (userType: string) => {
     try {
-      console.log('💾 Saving user verification to hybrid storage...')
-      await hybridStorage.setUserVerified(userType)
+      console.log('💾 Saving user verification to AsyncStorage...')
+      await asyncStorage.setUserVerified(userType)
       console.log('✅ User verification saved, refreshing auth status...')
       await checkAuthStatus() // Refresh auth session
     } catch (error) {
@@ -93,7 +93,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
           // User is logged out, clear verification status
           setIsVerified(false)
           setAuthSession(null)
-          await hybridStorage.clearAuthSession()
+          await asyncStorage.clearAuthSession()
         }
 
         setLoading(false)
@@ -113,9 +113,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const logout = async () => {
     try {
       console.log('🚪 Logging out user...')
-      // Clear hybrid storage first
-      await hybridStorage.clearAuthSession()
-      console.log('✅ Hybrid storage cleared')
+      // Clear AsyncStorage first
+      await asyncStorage.clearAuthSession()
+      console.log('✅ AsyncStorage cleared')
 
       // Sign out from Firebase
       await signOut(auth)
