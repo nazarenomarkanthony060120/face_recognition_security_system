@@ -173,10 +173,15 @@ const LoginAuthentication = ({ params }: LoginAuthenticationProps) => {
       })
 
       const result = await verifyOTP({ phoneNumber, otp: trimmedOTP })
+      console.log('✅ OTP verification successful:', result)
 
       // Mark user as verified in secure storage
+      console.log('🔄 Attempting to save user verification...')
       if (setUserVerified) {
         await setUserVerified(type)
+        console.log('✅ User verification saved successfully for type:', type)
+      } else {
+        console.error('❌ setUserVerified function not available!')
       }
 
       // Send success notification
@@ -187,6 +192,7 @@ const LoginAuthentication = ({ params }: LoginAuthenticationProps) => {
 
       // If verification is successful, navigate to the appropriate screen based on user type
       const route = getUserRoutes({ type: type })
+      console.log('🚀 Navigating to dashboard:', route)
       router.replace(route) // Use replace to prevent going back to OTP screen
     } catch (error) {
       console.error('OTP verification error:', error)

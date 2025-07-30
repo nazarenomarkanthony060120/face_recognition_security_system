@@ -26,16 +26,46 @@ const index = () => {
   useEffect(() => {
     const initializeApp = async () => {
       try {
+        console.log('🚀 App initialization started')
+        console.log('Auth state:', {
+          loading,
+          isInitialized,
+          hasUser: !!user,
+          userEmail: user?.email,
+          isVerified,
+          hasAuthSession: !!authSession,
+          sessionUserType: authSession?.userType,
+        })
+
         // Wait for auth to finish loading and initialization to complete
-        if (loading || !isInitialized) return
+        if (loading || !isInitialized) {
+          console.log('⏳ Waiting for auth initialization...')
+          return
+        }
+
+        console.log('✅ Auth initialization complete')
 
         // Check for auto login: user must be both authenticated AND verified
         if (user && isVerified && authSession && authSession.userType) {
+          console.log('🎯 Auto login conditions met!')
+          console.log('- User authenticated:', !!user)
+          console.log('- User verified:', isVerified)
+          console.log('- Session exists:', !!authSession)
+          console.log('- User type:', authSession.userType)
+
           // Use stored user type from auth session for faster routing
           const route = getUserRoutes({ type: authSession.userType as any })
+          console.log('🚀 AUTO LOGIN: Redirecting to', route)
           router.replace(route)
           return
         }
+
+        console.log('❌ Auto login failed - showing splash screen')
+        console.log('Reasons:')
+        console.log('- Has user:', !!user)
+        console.log('- Is verified:', isVerified)
+        console.log('- Has session:', !!authSession)
+        console.log('- Session user type:', authSession?.userType)
 
         // User is not authenticated or not verified, show splash screen
         setIsLoading(false)

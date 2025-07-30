@@ -2,7 +2,7 @@ import React, { createContext, useState, useEffect, useContext } from 'react'
 import { auth, onAuthStateChanged, User } from '@/lib/firestore'
 import { signOut } from 'firebase/auth'
 import { useRouter } from 'expo-router'
-import { secureStorage, AuthSession } from '@/lib/secureStorage'
+import { hybridStorage, AuthSession } from '@/lib/hybridStorage'
 
 type ContextProps = {
   user: User | null
@@ -31,11 +31,26 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   const checkAuthStatus = async () => {
     try {
-      const session = await secureStorage.getAuthSession()
+      console.log('🔍 Checking auth status from hybrid storage...')
+      const session = await hybridStorage.getAuthSession()
+      console.log('📦 Retrieved session:', {
+        hasSession: !!session,
+        isVerified: session?.isVerified,
+        userType: session?.userType,
+        expiryDate: session?.sessionExpiry
+          ? new Date(session.sessionExpiry).toLocaleString()
+          : null,
+      })
+
       setAuthSession(session)
       setIsVerified(session?.isVerified === true)
+
+      console.log('✅ Auth status updated:', {
+        isVerified: session?.isVerified === true,
+        hasSession: !!session,
+      })
     } catch (error) {
-      console.error('Failed to check auth status:', error)
+      console.error('❌ Failed to check auth status:', error)
       setAuthSession(null)
       setIsVerified(false)
     }
@@ -43,10 +58,12 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   const setUserVerified = async (userType: string) => {
     try {
-      await secureStorage.setUserVerified(userType)
+      console.log('💾 Saving user verification to hybrid storage...')
+      await hybridStorage.setUserVerified(userType)
+      console.log('✅ User verification saved, refreshing auth status...')
       await checkAuthStatus() // Refresh auth session
     } catch (error) {
-      console.error('Failed to set user as verified:', error)
+      console.error('❌ Failed to set user as verified:', error)
       throw error
     }
   }
@@ -60,23 +77,31 @@ export function AuthProvider({ children }: AuthProviderProps) {
     const unsubscribe = onAuthStateChanged(
       auth,
       async (firebaseUser) => {
+        console.log('🔥 Firebase auth state changed:', {
+          isLoggedIn: !!firebaseUser,
+          email: firebaseUser?.email,
+        })
+
         setUser(firebaseUser)
 
         if (firebaseUser) {
+          console.log('✅ Firebase user found, checking verification status...')
           // User is authenticated with Firebase, check verification status
           await checkAuthStatus()
         } else {
+          console.log('❌ No Firebase user, clearing verification status...')
           // User is logged out, clear verification status
           setIsVerified(false)
           setAuthSession(null)
-          await secureStorage.clearAuthSession()
+          await hybridStorage.clearAuthSession()
         }
 
         setLoading(false)
         setIsInitialized(true)
+        console.log('🏁 Auth initialization complete')
       },
       (error) => {
-        console.error('Auth state change error:', error)
+        console.error('❌ Auth state change error:', error)
         setLoading(false)
         setIsInitialized(true)
       },
@@ -87,11 +112,14 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   const logout = async () => {
     try {
-      // Clear secure storage first
-      await secureStorage.clearAuthSession()
+      console.log('🚪 Logging out user...')
+      // Clear hybrid storage first
+      await hybridStorage.clearAuthSession()
+      console.log('✅ Hybrid storage cleared')
 
       // Sign out from Firebase
       await signOut(auth)
+      console.log('✅ Firebase sign out complete')
 
       // Clear local state
       setIsVerified(false)
@@ -100,7 +128,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       // The onAuthStateChanged will handle the rest
       router.replace('/(auth)/login')
     } catch (error) {
-      console.error('Logout error:', error)
+      console.error('❌ Logout error:', error)
       throw error
     }
   }

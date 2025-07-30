@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react'
 import { AppState, AppStateStatus } from 'react-native'
 import { useAuth } from '@/context/auth'
-import { secureStorage } from '@/lib/secureStorage'
+import { hybridStorage } from '@/lib/hybridStorage'
 
 /**
  * Hook to automatically extend user session when app is active
@@ -31,7 +31,7 @@ export const useSessionExtension = () => {
         now - lastExtensionTime.current > EXTENSION_INTERVAL
       ) {
         try {
-          await secureStorage.extendSession()
+          await hybridStorage.extendSession()
           lastExtensionTime.current = now
           console.log('Session extended automatically')
         } catch (error) {
@@ -63,7 +63,7 @@ export const useManualSessionExtension = () => {
     }
 
     try {
-      await secureStorage.extendSession()
+      await hybridStorage.extendSession()
       console.log('Session extended manually')
       return true
     } catch (error) {

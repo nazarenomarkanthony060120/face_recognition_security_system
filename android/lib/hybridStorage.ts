@@ -1,4 +1,5 @@
 import * as SecureStore from 'expo-secure-store'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 
 // Keys for storing authentication data
 const AUTH_KEYS = {
@@ -18,7 +19,85 @@ export interface AuthSession {
   sessionExpiry: number
 }
 
-class SecureStorageService {
+class HybridStorageService {
+  private useSecureStore = true
+
+  /**
+   * Store an item using SecureStore first, fallback to AsyncStorage
+   */
+  private async setItem(key: string, value: string): Promise<void> {
+    try {
+      if (this.useSecureStore) {
+        await SecureStore.setItemAsync(key, value)
+        console.log(`✅ Saved to SecureStore: ${key}`)
+      } else {
+        await AsyncStorage.setItem(key, value)
+        console.log(`✅ Saved to AsyncStorage: ${key}`)
+      }
+    } catch (error) {
+      if (this.useSecureStore) {
+        console.log(`⚠️ SecureStore failed for ${key}, trying AsyncStorage...`)
+        this.useSecureStore = false
+        await AsyncStorage.setItem(key, value)
+        console.log(`✅ Saved to AsyncStorage (fallback): ${key}`)
+      } else {
+        throw error
+      }
+    }
+  }
+
+  /**
+   * Get an item using SecureStore first, fallback to AsyncStorage
+   */
+  private async getItem(key: string): Promise<string | null> {
+    try {
+      if (this.useSecureStore) {
+        const value = await SecureStore.getItemAsync(key)
+        if (value !== null) {
+          console.log(`📖 Read from SecureStore: ${key}`)
+          return value
+        }
+        // If not found in SecureStore, try AsyncStorage
+        console.log(`🔄 Not found in SecureStore, trying AsyncStorage: ${key}`)
+        const asyncValue = await AsyncStorage.getItem(key)
+        if (asyncValue !== null) {
+          console.log(`📖 Found in AsyncStorage: ${key}`)
+        }
+        return asyncValue
+      } else {
+        const value = await AsyncStorage.getItem(key)
+        console.log(`📖 Read from AsyncStorage: ${key}`)
+        return value
+      }
+    } catch (error) {
+      if (this.useSecureStore) {
+        console.log(`⚠️ SecureStore failed for ${key}, trying AsyncStorage...`)
+        this.useSecureStore = false
+        const value = await AsyncStorage.getItem(key)
+        console.log(`📖 Read from AsyncStorage (fallback): ${key}`)
+        return value
+      } else {
+        throw error
+      }
+    }
+  }
+
+  /**
+   * Delete an item from both stores
+   */
+  private async deleteItem(key: string): Promise<void> {
+    try {
+      // Try to delete from both stores to be safe
+      await Promise.allSettled([
+        SecureStore.deleteItemAsync(key),
+        AsyncStorage.removeItem(key)
+      ])
+      console.log(`🗑️ Deleted from both stores: ${key}`)
+    } catch (error) {
+      console.error(`❌ Failed to delete ${key}:`, error)
+    }
+  }
+
   /**
    * Store user verification status after successful OTP verification
    */
@@ -27,7 +106,8 @@ class SecureStorageService {
       const timestamp = Date.now()
       const expiry = timestamp + SESSION_DURATION
 
-      console.log('💾 SAVING VERIFICATION DATA TO SECURE STORAGE')
+      console.log('💾 SAVING VERIFICATION DATA TO HYBRID STORAGE')
+      console.log('Storage method:', this.useSecureStore ? 'SecureStore (primary)' : 'AsyncStorage (fallback)')
       console.log('Data to save:', {
         userType,
         timestamp: new Date(timestamp).toLocaleString(),
@@ -36,20 +116,20 @@ class SecureStorageService {
       })
 
       await Promise.all([
-        SecureStore.setItemAsync(AUTH_KEYS.IS_VERIFIED, 'true'),
-        SecureStore.setItemAsync(AUTH_KEYS.USER_TYPE, userType),
-        SecureStore.setItemAsync(AUTH_KEYS.LOGIN_TIMESTAMP, timestamp.toString()),
-        SecureStore.setItemAsync(AUTH_KEYS.SESSION_EXPIRY, expiry.toString()),
+        this.setItem(AUTH_KEYS.IS_VERIFIED, 'true'),
+        this.setItem(AUTH_KEYS.USER_TYPE, userType),
+        this.setItem(AUTH_KEYS.LOGIN_TIMESTAMP, timestamp.toString()),
+        this.setItem(AUTH_KEYS.SESSION_EXPIRY, expiry.toString()),
       ])
 
       console.log('✅ ALL VERIFICATION DATA SAVED SUCCESSFULLY')
 
       // Verify the data was saved by reading it back
       const verification = await Promise.all([
-        SecureStore.getItemAsync(AUTH_KEYS.IS_VERIFIED),
-        SecureStore.getItemAsync(AUTH_KEYS.USER_TYPE),
-        SecureStore.getItemAsync(AUTH_KEYS.LOGIN_TIMESTAMP),
-        SecureStore.getItemAsync(AUTH_KEYS.SESSION_EXPIRY),
+        this.getItem(AUTH_KEYS.IS_VERIFIED),
+        this.getItem(AUTH_KEYS.USER_TYPE),
+        this.getItem(AUTH_KEYS.LOGIN_TIMESTAMP),
+        this.getItem(AUTH_KEYS.SESSION_EXPIRY),
       ])
 
       console.log('🔍 VERIFICATION - Data read back:', {
@@ -69,16 +149,16 @@ class SecureStorageService {
    */
   async getAuthSession(): Promise<AuthSession | null> {
     try {
-      console.log('📖 READING AUTH SESSION FROM SECURE STORAGE')
+      console.log('📖 READING AUTH SESSION FROM HYBRID STORAGE')
 
       const [isVerified, userType, loginTimestamp, sessionExpiry] = await Promise.all([
-        SecureStore.getItemAsync(AUTH_KEYS.IS_VERIFIED),
-        SecureStore.getItemAsync(AUTH_KEYS.USER_TYPE),
-        SecureStore.getItemAsync(AUTH_KEYS.LOGIN_TIMESTAMP),
-        SecureStore.getItemAsync(AUTH_KEYS.SESSION_EXPIRY),
+        this.getItem(AUTH_KEYS.IS_VERIFIED),
+        this.getItem(AUTH_KEYS.USER_TYPE),
+        this.getItem(AUTH_KEYS.LOGIN_TIMESTAMP),
+        this.getItem(AUTH_KEYS.SESSION_EXPIRY),
       ])
 
-      console.log('📦 Raw data from secure storage:', {
+      console.log('📦 Raw data from storage:', {
         isVerified,
         userType,
         loginTimestamp,
@@ -130,17 +210,17 @@ class SecureStorageService {
   }
 
   /**
-   * Clear all authentication data from secure storage
+   * Clear all authentication data from storage
    */
   async clearAuthSession(): Promise<void> {
     try {
-      console.log('🧹 CLEARING AUTH SESSION FROM SECURE STORAGE')
+      console.log('🧹 CLEARING AUTH SESSION FROM HYBRID STORAGE')
 
       await Promise.all([
-        SecureStore.deleteItemAsync(AUTH_KEYS.IS_VERIFIED),
-        SecureStore.deleteItemAsync(AUTH_KEYS.USER_TYPE),
-        SecureStore.deleteItemAsync(AUTH_KEYS.LOGIN_TIMESTAMP),
-        SecureStore.deleteItemAsync(AUTH_KEYS.SESSION_EXPIRY),
+        this.deleteItem(AUTH_KEYS.IS_VERIFIED),
+        this.deleteItem(AUTH_KEYS.USER_TYPE),
+        this.deleteItem(AUTH_KEYS.LOGIN_TIMESTAMP),
+        this.deleteItem(AUTH_KEYS.SESSION_EXPIRY),
       ])
 
       console.log('✅ AUTH SESSION CLEARED SUCCESSFULLY')
@@ -151,7 +231,7 @@ class SecureStorageService {
   }
 
   /**
-   * Extend current session expiry (useful for activity-based session extension)
+   * Extend current session expiry
    */
   async extendSession(): Promise<void> {
     try {
@@ -162,7 +242,7 @@ class SecureStorageService {
       }
 
       const newExpiry = Date.now() + SESSION_DURATION
-      await SecureStore.setItemAsync(AUTH_KEYS.SESSION_EXPIRY, newExpiry.toString())
+      await this.setItem(AUTH_KEYS.SESSION_EXPIRY, newExpiry.toString())
 
       console.log('Session extended successfully')
     } catch (error) {
@@ -175,7 +255,7 @@ class SecureStorageService {
    */
   async getUserType(): Promise<string | null> {
     try {
-      return await SecureStore.getItemAsync(AUTH_KEYS.USER_TYPE)
+      return await this.getItem(AUTH_KEYS.USER_TYPE)
     } catch (error) {
       console.error('Failed to get user type:', error)
       return null
@@ -184,7 +264,7 @@ class SecureStorageService {
 }
 
 // Export singleton instance
-export const secureStorage = new SecureStorageService()
+export const hybridStorage = new HybridStorageService()
 
 // Export for testing
-export { SecureStorageService } 
+export { HybridStorageService } 
