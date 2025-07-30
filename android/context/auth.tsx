@@ -9,6 +9,7 @@ type ContextProps = {
   loading: boolean
   isVerified: boolean
   authSession: AuthSession | null
+  isInitialized: boolean
   checkAuthStatus: () => Promise<void>
   setUserVerified: (userType: string) => Promise<void>
   logout: () => Promise<void>
@@ -25,6 +26,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const [loading, setLoading] = useState(true)
   const [isVerified, setIsVerified] = useState(false)
   const [authSession, setAuthSession] = useState<AuthSession | null>(null)
+  const [isInitialized, setIsInitialized] = useState(false)
   const router = useRouter()
 
   const checkAuthStatus = async () => {
@@ -32,11 +34,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
       const session = await secureStorage.getAuthSession()
       setAuthSession(session)
       setIsVerified(session?.isVerified === true)
-      console.log('Auth status checked:', {
-        hasSession: !!session,
-        isVerified: session?.isVerified,
-        userType: session?.userType,
-      })
     } catch (error) {
       console.error('Failed to check auth status:', error)
       setAuthSession(null)
@@ -48,7 +45,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
     try {
       await secureStorage.setUserVerified(userType)
       await checkAuthStatus() // Refresh auth session
-      console.log('User marked as verified:', userType)
     } catch (error) {
       console.error('Failed to set user as verified:', error)
       throw error
@@ -64,10 +60,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
     const unsubscribe = onAuthStateChanged(
       auth,
       async (firebaseUser) => {
-        console.log(
-          'Auth state changed:',
-          firebaseUser ? 'User logged in' : 'User logged out',
-        )
         setUser(firebaseUser)
 
         if (firebaseUser) {
@@ -81,10 +73,12 @@ export function AuthProvider({ children }: AuthProviderProps) {
         }
 
         setLoading(false)
+        setIsInitialized(true)
       },
       (error) => {
         console.error('Auth state change error:', error)
         setLoading(false)
+        setIsInitialized(true)
       },
     )
 
@@ -95,18 +89,16 @@ export function AuthProvider({ children }: AuthProviderProps) {
     try {
       // Clear secure storage first
       await secureStorage.clearAuthSession()
-      
+
       // Sign out from Firebase
       await signOut(auth)
-      
+
       // Clear local state
       setIsVerified(false)
       setAuthSession(null)
-      
+
       // The onAuthStateChanged will handle the rest
       router.replace('/(auth)/login')
-      
-      console.log('User logged out successfully')
     } catch (error) {
       console.error('Logout error:', error)
       throw error
@@ -114,15 +106,16 @@ export function AuthProvider({ children }: AuthProviderProps) {
   }
 
   return (
-    <AuthContext.Provider 
-      value={{ 
-        user, 
-        loading, 
-        isVerified, 
-        authSession, 
-        checkAuthStatus, 
-        setUserVerified, 
-        logout 
+    <AuthContext.Provider
+      value={{
+        user,
+        loading,
+        isVerified,
+        authSession,
+        isInitialized,
+        checkAuthStatus,
+        setUserVerified,
+        logout,
       }}
     >
       {children}

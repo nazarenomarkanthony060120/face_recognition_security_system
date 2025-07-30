@@ -14,7 +14,7 @@ import { getUserRoutes } from '@/features/common/part/getUserRoutes'
 
 const index = () => {
   const router = useRouter()
-  const { user, loading, isVerified, authSession } = useAuth()
+  const { user, loading, isVerified, authSession, isInitialized } = useAuth()
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<Error | null>(null)
 
@@ -26,39 +26,19 @@ const index = () => {
   useEffect(() => {
     const initializeApp = async () => {
       try {
-        // Wait for auth to finish loading
-        if (loading) return
-
-        console.log('App initialization:', {
-          hasUser: !!user,
-          isVerified,
-          hasAuthSession: !!authSession,
-          userDataLoading,
-          hasUserData: !!userData,
-        })
+        // Wait for auth to finish loading and initialization to complete
+        if (loading || !isInitialized) return
 
         // Check for auto login: user must be both authenticated AND verified
         if (user && isVerified && authSession && authSession.userType) {
           // Use stored user type from auth session for faster routing
           const route = getUserRoutes({ type: authSession.userType as any })
-          console.log('Auto login: redirecting to', route)
           router.replace(route)
           return
         }
 
-        // If user is authenticated but not verified, redirect to login (session expired)
-        if (user && !isVerified) {
-          console.log('User authenticated but not verified, clearing session')
-          // The auth context will handle clearing the session
-          setIsLoading(false)
-          return
-        }
-
-        // User is not authenticated, show splash screen
-        if (!user) {
-          console.log('No authenticated user, showing splash screen')
-          setIsLoading(false)
-        }
+        // User is not authenticated or not verified, show splash screen
+        setIsLoading(false)
       } catch (err) {
         console.error('App initialization error:', err)
         setError(
@@ -69,15 +49,7 @@ const index = () => {
     }
 
     initializeApp()
-  }, [
-    user,
-    loading,
-    isVerified,
-    authSession,
-    userData,
-    userDataLoading,
-    router,
-  ])
+  }, [user, loading, isVerified, authSession, isInitialized, router])
 
   const navigateToLogin = () => {
     try {
@@ -88,7 +60,7 @@ const index = () => {
   }
 
   // Show loading while auth is initializing, checking verification status, or user data is loading
-  if (loading || isLoading) {
+  if (loading || !isInitialized || isLoading) {
     return (
       <SafeAreaView className="flex-1 bg-slate-800 items-center justify-center">
         <ActivityIndicator size="large" color="#ffffff" />

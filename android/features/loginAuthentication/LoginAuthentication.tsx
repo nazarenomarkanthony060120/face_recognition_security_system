@@ -173,12 +173,10 @@ const LoginAuthentication = ({ params }: LoginAuthenticationProps) => {
       })
 
       const result = await verifyOTP({ phoneNumber, otp: trimmedOTP })
-      console.log('OTP verification successful:', result)
 
       // Mark user as verified in secure storage
       if (setUserVerified) {
         await setUserVerified(type)
-        console.log('User verification status saved')
       }
 
       // Send success notification

@@ -33,8 +33,6 @@ class SecureStorageService {
         SecureStore.setItemAsync(AUTH_KEYS.LOGIN_TIMESTAMP, timestamp.toString()),
         SecureStore.setItemAsync(AUTH_KEYS.SESSION_EXPIRY, expiry.toString()),
       ])
-
-      console.log('User verification status saved to secure storage')
     } catch (error) {
       console.error('Failed to save verification status:', error)
       throw error
@@ -54,7 +52,6 @@ class SecureStorageService {
       ])
 
       if (!isVerified || !userType || !loginTimestamp || !sessionExpiry) {
-        console.log('Incomplete auth session data')
         return null
       }
 
@@ -67,12 +64,10 @@ class SecureStorageService {
 
       // Check if session has expired
       if (session.sessionExpiry < Date.now()) {
-        console.log('Auth session has expired')
         await this.clearAuthSession()
         return null
       }
 
-      console.log('Valid auth session found')
       return session
     } catch (error) {
       console.error('Failed to get auth session:', error)
