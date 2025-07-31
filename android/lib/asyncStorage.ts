@@ -1,3 +1,4 @@
+import { UserType } from '@/utils/types'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 
 // Keys for storing authentication data
@@ -67,7 +68,7 @@ class AsyncStorageService {
 
       const session: AuthSession = {
         isVerified: isVerified === 'true',
-        userType: userType === 'User' ? 'User' : 'Administrator',
+        userType: userType === UserType.USER ? UserType.USER : UserType.ADMININISTRATOR,
         loginTimestamp: parseInt(loginTimestamp, 10),
         sessionExpiry: parseInt(sessionExpiry, 10),
       }

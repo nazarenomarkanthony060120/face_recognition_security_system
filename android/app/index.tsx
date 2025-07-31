@@ -9,7 +9,6 @@ import { View, ActivityIndicator, ScrollView } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { LinearGradient } from 'expo-linear-gradient'
 import { useAuth } from '@/context/auth'
-import { useFetchUserById } from '@/hooks/common/fetchUserById'
 import { getUserRoutes } from '@/features/common/part/getUserRoutes'
 
 const index = () => {
@@ -17,11 +16,6 @@ const index = () => {
   const { user, loading, isVerified, authSession, isInitialized } = useAuth()
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<Error | null>(null)
-
-  // Fetch user data only if user is authenticated
-  const { data: userData, isLoading: userDataLoading } = useFetchUserById({
-    id: user?.uid,
-  })
 
   useEffect(() => {
     const initializeApp = async () => {
