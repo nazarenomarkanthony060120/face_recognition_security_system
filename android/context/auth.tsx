@@ -2,7 +2,7 @@ import React, { createContext, useState, useEffect, useContext } from 'react'
 import { auth, onAuthStateChanged, User } from '@/lib/firestore'
 import { signOut } from 'firebase/auth'
 import { useRouter } from 'expo-router'
-import { asyncStorage, AuthSession } from '@/lib/asyncStorage'
+import { hybridStorage, AuthSession } from '@/lib/hybridStorage'
 
 type ContextProps = {
   user: User | null
@@ -10,7 +10,7 @@ type ContextProps = {
   isVerified: boolean
   authSession: AuthSession | null
   isInitialized: boolean
-  checkAuthStatus: () => Promise<void>
+  checkAuthStatus: () => Promise<AuthSession | null>
   setUserVerified: (userType: string) => Promise<void>
   logout: () => Promise<void>
 }
@@ -31,8 +31,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   const checkAuthStatus = async () => {
     try {
-      console.log('🔍 Checking auth status from AsyncStorage...')
-      const session = await asyncStorage.getAuthSession()
+      console.log('🔍 Checking auth status from HybridStorage...')
+      const session = await hybridStorage.getAuthSession()
       console.log('📦 Retrieved session:', {
         hasSession: !!session,
         isVerified: session?.isVerified,
@@ -49,17 +49,20 @@ export function AuthProvider({ children }: AuthProviderProps) {
         isVerified: session?.isVerified === true,
         hasSession: !!session,
       })
+
+      return session
     } catch (error) {
       console.error('❌ Failed to check auth status:', error)
       setAuthSession(null)
       setIsVerified(false)
+      return null
     }
   }
 
   const setUserVerified = async (userType: string) => {
     try {
-      console.log('💾 Saving user verification to AsyncStorage...')
-      await asyncStorage.setUserVerified(userType)
+      console.log('💾 Saving user verification to HybridStorage...')
+      await hybridStorage.setUserVerified(userType)
       console.log('✅ User verification saved, refreshing auth status...')
       await checkAuthStatus() // Refresh auth session
     } catch (error) {
@@ -68,9 +71,40 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }
   }
 
+  // Initial session check - happens once on app start
+  useEffect(() => {
+    const initializeAuth = async () => {
+      try {
+        console.log('🚀 Initializing auth - checking stored session first...')
+
+        // First check if we have a valid stored session
+        const storedSession = await checkAuthStatus()
+
+        if (storedSession && storedSession.isVerified) {
+          console.log(
+            '✅ Valid stored session found - user should be auto-logged in',
+          )
+          console.log('📊 Session details:', {
+            userType: storedSession.userType,
+            isVerified: storedSession.isVerified,
+            expiresAt: new Date(storedSession.sessionExpiry).toLocaleString(),
+          })
+        } else {
+          console.log('❌ No valid stored session found')
+        }
+      } catch (error) {
+        console.error('❌ Failed to initialize auth:', error)
+      }
+    }
+
+    initializeAuth()
+  }, [])
+
+  // Firebase auth state listener
   useEffect(() => {
     if (!auth) {
       setLoading(false)
+      setIsInitialized(true)
       return
     }
 
@@ -85,15 +119,25 @@ export function AuthProvider({ children }: AuthProviderProps) {
         setUser(firebaseUser)
 
         if (firebaseUser) {
-          console.log('✅ Firebase user found, checking verification status...')
-          // User is authenticated with Firebase, check verification status
+          console.log('✅ Firebase user found, syncing with stored session...')
+          // User is authenticated with Firebase, sync with stored session
           await checkAuthStatus()
         } else {
-          console.log('❌ No Firebase user, clearing verification status...')
-          // User is logged out, clear verification status
-          setIsVerified(false)
-          setAuthSession(null)
-          await asyncStorage.clearAuthSession()
+          console.log('❌ No Firebase user found')
+          // Only clear stored session if we're sure the user logged out
+          // (not on initial load where Firebase might just be slow)
+          const storedSession = await hybridStorage.getAuthSession()
+          if (!storedSession) {
+            console.log(
+              '💡 No stored session either - user is definitely logged out',
+            )
+            setIsVerified(false)
+            setAuthSession(null)
+          } else {
+            console.log(
+              '🤔 Firebase user missing but stored session exists - keeping session for now',
+            )
+          }
         }
 
         setLoading(false)
@@ -113,9 +157,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const logout = async () => {
     try {
       console.log('🚪 Logging out user...')
-      // Clear AsyncStorage first
-      await asyncStorage.clearAuthSession()
-      console.log('✅ AsyncStorage cleared')
+      // Clear HybridStorage first
+      await hybridStorage.clearAuthSession()
+      console.log('✅ HybridStorage cleared')
 
       // Sign out from Firebase
       await signOut(auth)

@@ -45,13 +45,17 @@ const index = () => {
 
         console.log('✅ Auth initialization complete')
 
-        // Check for auto login: user must be both authenticated AND verified
-        if (user && isVerified && authSession && authSession.userType) {
+        // Check for auto login: prioritize session state as source of truth
+        if (isVerified && authSession && authSession.userType) {
           console.log('🎯 Auto login conditions met!')
-          console.log('- User authenticated:', !!user)
-          console.log('- User verified:', isVerified)
+          console.log('- Session verified:', isVerified)
           console.log('- Session exists:', !!authSession)
           console.log('- User type:', authSession.userType)
+          console.log(
+            '- Firebase user status:',
+            !!user,
+            '(not required for auto-login)',
+          )
 
           // Use stored user type from auth session for faster routing
           const route = getUserRoutes({ type: authSession.userType as any })
@@ -62,10 +66,10 @@ const index = () => {
 
         console.log('❌ Auto login failed - showing splash screen')
         console.log('Reasons:')
-        console.log('- Has user:', !!user)
         console.log('- Is verified:', isVerified)
         console.log('- Has session:', !!authSession)
         console.log('- Session user type:', authSession?.userType)
+        console.log('- Firebase user (info only):', !!user)
 
         // User is not authenticated or not verified, show splash screen
         setIsLoading(false)
@@ -79,7 +83,7 @@ const index = () => {
     }
 
     initializeApp()
-  }, [user, loading, isVerified, authSession, isInitialized, router])
+  }, [loading, isVerified, authSession, isInitialized, router])
 
   const navigateToLogin = () => {
     try {

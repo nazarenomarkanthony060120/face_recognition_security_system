@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react'
 import { AppState, AppStateStatus } from 'react-native'
 import { useAuth } from '@/context/auth'
-import { asyncStorage } from '@/lib/asyncStorage'
+import { hybridStorage } from '@/lib/hybridStorage'
 
 /**
  * Hook to automatically extend user session when app is active
@@ -31,7 +31,7 @@ export const useSessionExtension = () => {
         now - lastExtensionTime.current > EXTENSION_INTERVAL
       ) {
         try {
-          await asyncStorage.extendSession()
+          await hybridStorage.extendSession()
           lastExtensionTime.current = now
           console.log('Session extended automatically')
         } catch (error) {
@@ -57,20 +57,15 @@ export const useManualSessionExtension = () => {
   const { user, isVerified } = useAuth()
 
   const extendSession = async () => {
-    if (!user || !isVerified) {
-      console.log('Cannot extend session: user not authenticated or verified')
-      return false
-    }
+    if (!user || !isVerified) return
 
     try {
-      await asyncStorage.extendSession()
+      await hybridStorage.extendSession()
       console.log('Session extended manually')
-      return true
     } catch (error) {
       console.error('Failed to extend session manually:', error)
-      return false
     }
   }
 
-  return extendSession
+  return { extendSession }
 } 
