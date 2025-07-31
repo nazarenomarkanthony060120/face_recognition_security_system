@@ -56,9 +56,9 @@ const index = () => {
           )
 
           // Use stored user type from auth session for faster routing
-          const route = getUserRoutes({ type: authSession.userType as any })
+          const route = getUserRoutes({ type: authSession.userType })
           console.log('🚀 AUTO LOGIN: Attempting redirect to', route)
-
+          
           try {
             router.replace(route)
             console.log('✅ Auto login redirect initiated successfully')
