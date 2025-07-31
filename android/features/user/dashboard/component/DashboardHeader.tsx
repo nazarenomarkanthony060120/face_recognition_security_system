@@ -18,7 +18,7 @@ const DashboardHeader = () => {
   const { searchQuery, setSearchQuery } = useSearch()
   const [showSearch, setShowSearch] = useState(false)
   const { data: students, isLoading } = useFetchAllStudents({
-    id: auth.user?.uid,
+    id: auth.getUserId?.(),
   })
 
   const stats = useMemo(() => {
@@ -51,10 +51,8 @@ const DashboardHeader = () => {
     <View className="mb-6">
       <View className="flex-row justify-between items-center mb-6">
         <View>
-          <Typo className="text-3xl text-white font-bold">My Students</Typo>
-          <Typo className="text-gray-400">
-            Welcome back, {auth.user?.displayName || 'User'}
-          </Typo>
+          <Typo className="text-3xl text-white font-bold">Dashboard</Typo>
+          <Typo className="text-gray-400">Welcome back!</Typo>
         </View>
         <View className="flex-row gap-2">
           <TouchableOpacity
@@ -65,107 +63,88 @@ const DashboardHeader = () => {
           </TouchableOpacity>
           <TouchableOpacity
             className="bg-white/10 p-3 rounded-full"
-            onPress={navigateToAddStudent}
-          >
-            <MaterialIcons name="person-add" size={24} color="#ffffff" />
-          </TouchableOpacity>
-          <TouchableOpacity
-            className="bg-white/10 p-3 rounded-full"
             onPress={navigateToProfile}
           >
             <MaterialIcons name="person" size={24} color="#ffffff" />
+          </TouchableOpacity>
+          <TouchableOpacity
+            className="bg-white/10 p-3 rounded-full"
+            onPress={navigateToAddStudent}
+          >
+            <MaterialIcons name="person-add" size={24} color="#ffffff" />
           </TouchableOpacity>
         </View>
       </View>
 
       {showSearch && (
-        <View className="mb-4">
-          <View className="flex-row items-center bg-white/10 rounded-xl px-4 py-2">
-            <MaterialIcons name="search" size={20} color="#ffffff80" />
+        <View className="mb-6">
+          <View className="bg-white/10 rounded-xl border border-white/10">
             <TextInput
-              className="flex-1 text-white ml-2 py-2"
+              className="px-4 py-3 text-white"
               placeholder="Search students..."
-              placeholderTextColor="#ffffff80"
+              placeholderTextColor="#9CA3AF"
               value={searchQuery}
               onChangeText={handleSearch}
+              autoFocus
             />
-            {searchQuery ? (
-              <TouchableOpacity onPress={() => handleSearch('')}>
-                <MaterialIcons name="close" size={20} color="#ffffff80" />
-              </TouchableOpacity>
-            ) : null}
           </View>
         </View>
       )}
 
-      <View className="flex-row gap-4">
-        <TouchableOpacity
-          className="flex-1 bg-white/10 p-4 rounded-xl"
-          onPress={() => setShowSearch(false)}
-        >
-          <View className="flex-row items-center justify-between mb-2">
-            <Typo className="text-gray-400">Total Boarders</Typo>
-            <MaterialIcons name="people" size={20} color="#ffffff80" />
+      <View className="flex-row gap-4 mb-6">
+        <View className="flex-1 bg-white/10 p-4 rounded-xl border border-white/10">
+          <View className="flex-row items-center justify-between">
+            <View>
+              <Typo className="text-2xl font-bold text-white">
+                {isLoading ? (
+                  <ActivityIndicator size="small" color="#ffffff" />
+                ) : (
+                  stats.total
+                )}
+              </Typo>
+              <Typo className="text-gray-400 text-sm">Total Students</Typo>
+            </View>
+            <View className="bg-blue-500/20 p-2 rounded-lg">
+              <MaterialIcons name="people" size={24} color="#3B82F6" />
+            </View>
           </View>
-          {isLoading ? (
-            <ActivityIndicator size="small" color="#ffffff" />
-          ) : (
-            <>
-              <Typo className="text-2xl text-white font-bold">
-                {stats.total}
+        </View>
+
+        <View className="flex-1 bg-white/10 p-4 rounded-xl border border-white/10">
+          <View className="flex-row items-center justify-between">
+            <View>
+              <Typo className="text-2xl font-bold text-white">
+                {isLoading ? (
+                  <ActivityIndicator size="small" color="#ffffff" />
+                ) : (
+                  stats.present
+                )}
               </Typo>
-              <Typo className="text-xs text-gray-400 mt-1">
-                {stats.total === 1 ? 'Enrolled boarder' : 'Enrolled boarders'}
-              </Typo>
-            </>
-          )}
-        </TouchableOpacity>
-        {/* <TouchableOpacity
-          className="flex-1 bg-white/10 p-4 rounded-xl"
-          onPress={() => setShowSearch(false)}
-        >
-          <View className="flex-row items-center justify-between mb-2">
-            <Typo className="text-gray-400">Present Today</Typo>
-            <MaterialIcons name="check-circle" size={20} color="#4ade80" />
+              <Typo className="text-gray-400 text-sm">Present</Typo>
+            </View>
+            <View className="bg-green-500/20 p-2 rounded-lg">
+              <MaterialIcons name="check-circle" size={24} color="#10B981" />
+            </View>
           </View>
-          {isLoading ? (
-            <ActivityIndicator size="small" color="#ffffff" />
-          ) : (
-            <>
-              <Typo className="text-2xl text-green-400 font-bold">
-                {stats.present}
+        </View>
+
+        <View className="flex-1 bg-white/10 p-4 rounded-xl border border-white/10">
+          <View className="flex-row items-center justify-between">
+            <View>
+              <Typo className="text-2xl font-bold text-white">
+                {isLoading ? (
+                  <ActivityIndicator size="small" color="#ffffff" />
+                ) : (
+                  stats.absent
+                )}
               </Typo>
-              <Typo className="text-xs text-gray-400 mt-1">
-                {stats.present === 1
-                  ? 'Student in school'
-                  : 'Students in school'}
-              </Typo>
-            </>
-          )}
-        </TouchableOpacity>
-        <TouchableOpacity
-          className="flex-1 bg-white/10 p-4 rounded-xl"
-          onPress={() => setShowSearch(false)}
-        >
-          <View className="flex-row items-center justify-between mb-2">
-            <Typo className="text-gray-400">Absent</Typo>
-            <MaterialIcons name="cancel" size={20} color="#f87171" />
+              <Typo className="text-gray-400 text-sm">Absent</Typo>
+            </View>
+            <View className="bg-red-500/20 p-2 rounded-lg">
+              <MaterialIcons name="cancel" size={24} color="#EF4444" />
+            </View>
           </View>
-          {isLoading ? (
-            <ActivityIndicator size="small" color="#ffffff" />
-          ) : (
-            <>
-              <Typo className="text-2xl text-red-400 font-bold">
-                {stats.absent}
-              </Typo>
-              <Typo className="text-xs text-gray-400 mt-1">
-                {stats.absent === 1
-                  ? 'Student not present'
-                  : 'Students not present'}
-              </Typo>
-            </>
-          )}
-        </TouchableOpacity> */}
+        </View>
       </View>
     </View>
   )

@@ -11,7 +11,7 @@ const DashboardFormContents = () => {
   const auth = useAuth()
   const { searchQuery } = useSearch()
   const { data: students, isLoading } = useFetchAllStudents({
-    id: auth.user?.uid,
+    id: auth.getUserId?.(),
   })
 
   const filteredStudents = useMemo(() => {
@@ -59,9 +59,9 @@ const DashboardFormContents = () => {
     <View className="flex-1">
       <FlashList
         data={filteredStudents}
-        renderItem={({ item }) => <ViewLists student={item} />}
-        keyExtractor={(item) => item.id}
+        renderItem={({ item }) => <ViewLists key={item.id} data={item} />}
         estimatedItemSize={100}
+        showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 20 }}
       />
     </View>

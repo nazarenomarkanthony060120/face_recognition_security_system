@@ -13,6 +13,7 @@ type ContextProps = {
   checkAuthStatus: () => Promise<AuthSession | null>
   setUserVerified: (userType: string) => Promise<void>
   logout: () => Promise<void>
+  getUserId: () => string | undefined
 }
 
 const AuthContext = createContext<Partial<ContextProps>>({})
@@ -37,6 +38,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         hasSession: !!session,
         isVerified: session?.isVerified,
         userType: session?.userType,
+        userId: session?.userId,
         expiryDate: session?.sessionExpiry
           ? new Date(session.sessionExpiry).toLocaleString()
           : null,
@@ -48,6 +50,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       console.log('✅ Auth status updated:', {
         isVerified: session?.isVerified === true,
         hasSession: !!session,
+        userId: session?.userId,
       })
 
       return session
@@ -62,7 +65,12 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const setUserVerified = async (userType: string) => {
     try {
       console.log('💾 Saving user verification to HybridStorage...')
-      await hybridStorage.setUserVerified(userType)
+
+      if (!user?.uid) {
+        throw new Error('Firebase user not available for saving verification')
+      }
+
+      await hybridStorage.setUserVerified(userType, user.uid)
       console.log('✅ User verification saved, refreshing auth status...')
       await checkAuthStatus() // Refresh auth session
     } catch (error) {
@@ -86,6 +94,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
           )
           console.log('📊 Session details:', {
             userType: storedSession.userType,
+            userId: storedSession.userId,
             isVerified: storedSession.isVerified,
             expiresAt: new Date(storedSession.sessionExpiry).toLocaleString(),
           })
@@ -114,6 +123,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         console.log('🔥 Firebase auth state changed:', {
           isLoggedIn: !!firebaseUser,
           email: firebaseUser?.email,
+          uid: firebaseUser?.uid,
         })
 
         setUser(firebaseUser)
@@ -154,6 +164,15 @@ export function AuthProvider({ children }: AuthProviderProps) {
     return () => unsubscribe()
   }, [])
 
+  const getUserId = () => {
+    // Prioritize session user ID for auto-login scenarios
+    if (authSession?.userId) {
+      return authSession.userId
+    }
+    // Fallback to Firebase user ID
+    return user?.uid
+  }
+
   const logout = async () => {
     try {
       console.log('🚪 Logging out user...')
@@ -188,6 +207,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         checkAuthStatus,
         setUserVerified,
         logout,
+        getUserId,
       }}
     >
       {children}

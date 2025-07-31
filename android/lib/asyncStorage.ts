@@ -1,10 +1,10 @@
-import { UserType } from '@/utils/types'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 
 // Keys for storing authentication data
 const AUTH_KEYS = {
   IS_VERIFIED: 'user_verified',
   USER_TYPE: 'user_type',
+  USER_ID: 'user_id',
   LOGIN_TIMESTAMP: 'login_timestamp',
   SESSION_EXPIRY: 'session_expiry',
 } as const
@@ -15,6 +15,7 @@ const SESSION_DURATION = 30 * 24 * 60 * 60 * 1000
 export interface AuthSession {
   isVerified: boolean
   userType?: string
+  userId?: string
   loginTimestamp: number
   sessionExpiry: number
 }
@@ -23,7 +24,7 @@ class AsyncStorageService {
   /**
    * Store user verification status after successful OTP verification
    */
-  async setUserVerified(userType: string): Promise<void> {
+  async setUserVerified(userType: string, userId: string): Promise<void> {
     try {
       const timestamp = Date.now()
       const expiry = timestamp + SESSION_DURATION
@@ -31,6 +32,7 @@ class AsyncStorageService {
       await AsyncStorage.multiSet([
         [AUTH_KEYS.IS_VERIFIED, 'true'],
         [AUTH_KEYS.USER_TYPE, userType],
+        [AUTH_KEYS.USER_ID, userId],
         [AUTH_KEYS.LOGIN_TIMESTAMP, timestamp.toString()],
         [AUTH_KEYS.SESSION_EXPIRY, expiry.toString()],
       ])
@@ -50,6 +52,7 @@ class AsyncStorageService {
       const keys = [
         AUTH_KEYS.IS_VERIFIED,
         AUTH_KEYS.USER_TYPE,
+        AUTH_KEYS.USER_ID,
         AUTH_KEYS.LOGIN_TIMESTAMP,
         AUTH_KEYS.SESSION_EXPIRY,
       ]
@@ -59,16 +62,18 @@ class AsyncStorageService {
 
       const isVerified = data[AUTH_KEYS.IS_VERIFIED]
       const userType = data[AUTH_KEYS.USER_TYPE]
+      const userId = data[AUTH_KEYS.USER_ID]
       const loginTimestamp = data[AUTH_KEYS.LOGIN_TIMESTAMP]
       const sessionExpiry = data[AUTH_KEYS.SESSION_EXPIRY]
 
-      if (!isVerified || !userType || !loginTimestamp || !sessionExpiry) {
+      if (!isVerified || !userType || !userId || !loginTimestamp || !sessionExpiry) {
         return null
       }
 
       const session: AuthSession = {
         isVerified: isVerified === 'true',
-        userType: userType === UserType.USER ? UserType.USER : UserType.ADMININISTRATOR,
+        userType: userType === 'User' ? 'User' : 'Administrator',
+        userId,
         loginTimestamp: parseInt(loginTimestamp, 10),
         sessionExpiry: parseInt(sessionExpiry, 10),
       }
@@ -103,6 +108,7 @@ class AsyncStorageService {
       await AsyncStorage.multiRemove([
         AUTH_KEYS.IS_VERIFIED,
         AUTH_KEYS.USER_TYPE,
+        AUTH_KEYS.USER_ID,
         AUTH_KEYS.LOGIN_TIMESTAMP,
         AUTH_KEYS.SESSION_EXPIRY,
       ])

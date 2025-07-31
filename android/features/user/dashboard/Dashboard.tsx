@@ -14,10 +14,10 @@ const Dashboard = () => {
   const auth = useAuth()
   const [refreshing, setRefreshing] = useState(false)
   const { refetch: refetchStudents } = useFetchAllStudents({
-    id: auth.user?.uid,
+    id: auth.getUserId?.(),
   })
   const { refetch: refetchAttendance } = useFetchLatestAttendanceStatus({
-    id: auth.user?.uid,
+    id: auth.getUserId?.(),
   })
 
   const onRefresh = async () => {

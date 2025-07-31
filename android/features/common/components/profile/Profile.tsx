@@ -11,7 +11,9 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 const Profile = () => {
   const auth = useAuth()
 
-  const { data: userData, isLoading } = useFetchUserById({ id: auth.user?.uid })
+  const { data: userData, isLoading } = useFetchUserById({
+    id: auth.getUserId?.(),
+  })
 
   if (isLoading) return <LoadingIndicator />
 

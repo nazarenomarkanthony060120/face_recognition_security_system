@@ -5,6 +5,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 const AUTH_KEYS = {
   IS_VERIFIED: 'user_verified',
   USER_TYPE: 'user_type',
+  USER_ID: 'user_id',
   LOGIN_TIMESTAMP: 'login_timestamp',
   SESSION_EXPIRY: 'session_expiry',
 } as const
@@ -15,6 +16,7 @@ const SESSION_DURATION = 30 * 24 * 60 * 60 * 1000
 export interface AuthSession {
   isVerified: boolean
   userType?: string
+  userId?: string
   loginTimestamp: number
   sessionExpiry: number
 }
@@ -37,9 +39,13 @@ class HybridStorageService {
     } catch (error) {
       if (this.useSecureStore) {
         console.log(`⚠️ SecureStore failed for ${key}, trying AsyncStorage...`)
-        this.useSecureStore = false
-        await AsyncStorage.setItem(key, value)
-        console.log(`✅ Saved to AsyncStorage (fallback): ${key}`)
+        try {
+          await AsyncStorage.setItem(key, value)
+          console.log(`✅ Saved to AsyncStorage (fallback): ${key}`)
+        } catch (fallbackError) {
+          console.error(`❌ Both SecureStore and AsyncStorage failed for ${key}:`, fallbackError)
+          throw fallbackError
+        }
       } else {
         throw error
       }
@@ -57,6 +63,7 @@ class HybridStorageService {
           console.log(`📖 Read from SecureStore: ${key}`)
           return value
         }
+
         // If not found in SecureStore, try AsyncStorage
         console.log(`🔄 Not found in SecureStore, trying AsyncStorage: ${key}`)
         const asyncValue = await AsyncStorage.getItem(key)
@@ -72,27 +79,31 @@ class HybridStorageService {
     } catch (error) {
       if (this.useSecureStore) {
         console.log(`⚠️ SecureStore failed for ${key}, trying AsyncStorage...`)
-        this.useSecureStore = false
-        const value = await AsyncStorage.getItem(key)
-        console.log(`📖 Read from AsyncStorage (fallback): ${key}`)
-        return value
+        try {
+          const value = await AsyncStorage.getItem(key)
+          console.log(`📖 Read from AsyncStorage (fallback): ${key}`)
+          return value
+        } catch (fallbackError) {
+          console.error(`❌ Both SecureStore and AsyncStorage failed for ${key}:`, fallbackError)
+          return null
+        }
       } else {
-        throw error
+        console.error(`❌ AsyncStorage failed for ${key}:`, error)
+        return null
       }
     }
   }
 
   /**
-   * Delete an item from both stores
+   * Delete an item from both SecureStore and AsyncStorage
    */
   private async deleteItem(key: string): Promise<void> {
     try {
-      // Try to delete from both stores to be safe
       await Promise.allSettled([
         SecureStore.deleteItemAsync(key),
         AsyncStorage.removeItem(key)
       ])
-      console.log(`🗑️ Deleted from both stores: ${key}`)
+      console.log(`🗑️ Deleted from both storages: ${key}`)
     } catch (error) {
       console.error(`❌ Failed to delete ${key}:`, error)
     }
@@ -101,7 +112,7 @@ class HybridStorageService {
   /**
    * Store user verification status after successful OTP verification
    */
-  async setUserVerified(userType: string): Promise<void> {
+  async setUserVerified(userType: string, userId: string): Promise<void> {
     try {
       const timestamp = Date.now()
       const expiry = timestamp + SESSION_DURATION
@@ -110,6 +121,7 @@ class HybridStorageService {
       console.log('Storage method:', this.useSecureStore ? 'SecureStore (primary)' : 'AsyncStorage (fallback)')
       console.log('Data to save:', {
         userType,
+        userId,
         timestamp: new Date(timestamp).toLocaleString(),
         expiry: new Date(expiry).toLocaleString(),
         sessionDurationDays: SESSION_DURATION / (24 * 60 * 60 * 1000),
@@ -118,6 +130,7 @@ class HybridStorageService {
       await Promise.all([
         this.setItem(AUTH_KEYS.IS_VERIFIED, 'true'),
         this.setItem(AUTH_KEYS.USER_TYPE, userType),
+        this.setItem(AUTH_KEYS.USER_ID, userId),
         this.setItem(AUTH_KEYS.LOGIN_TIMESTAMP, timestamp.toString()),
         this.setItem(AUTH_KEYS.SESSION_EXPIRY, expiry.toString()),
       ])
@@ -128,6 +141,7 @@ class HybridStorageService {
       const verification = await Promise.all([
         this.getItem(AUTH_KEYS.IS_VERIFIED),
         this.getItem(AUTH_KEYS.USER_TYPE),
+        this.getItem(AUTH_KEYS.USER_ID),
         this.getItem(AUTH_KEYS.LOGIN_TIMESTAMP),
         this.getItem(AUTH_KEYS.SESSION_EXPIRY),
       ])
@@ -135,8 +149,9 @@ class HybridStorageService {
       console.log('🔍 VERIFICATION - Data read back:', {
         isVerified: verification[0],
         userType: verification[1],
-        loginTimestamp: verification[2],
-        sessionExpiry: verification[3],
+        userId: verification[2],
+        loginTimestamp: verification[3],
+        sessionExpiry: verification[4],
       })
     } catch (error) {
       console.error('❌ FAILED TO SAVE VERIFICATION STATUS:', error)
@@ -151,9 +166,10 @@ class HybridStorageService {
     try {
       console.log('📖 READING AUTH SESSION FROM HYBRID STORAGE')
 
-      const [isVerified, userType, loginTimestamp, sessionExpiry] = await Promise.all([
+      const [isVerified, userType, userId, loginTimestamp, sessionExpiry] = await Promise.all([
         this.getItem(AUTH_KEYS.IS_VERIFIED),
         this.getItem(AUTH_KEYS.USER_TYPE),
+        this.getItem(AUTH_KEYS.USER_ID),
         this.getItem(AUTH_KEYS.LOGIN_TIMESTAMP),
         this.getItem(AUTH_KEYS.SESSION_EXPIRY),
       ])
@@ -161,11 +177,12 @@ class HybridStorageService {
       console.log('📦 Raw data from storage:', {
         isVerified,
         userType,
+        userId,
         loginTimestamp,
         sessionExpiry,
       })
 
-      if (!isVerified || !userType || !loginTimestamp || !sessionExpiry) {
+      if (!isVerified || !userType || !userId || !loginTimestamp || !sessionExpiry) {
         console.log('❌ INCOMPLETE SESSION DATA - some values are missing')
         return null
       }
@@ -173,6 +190,7 @@ class HybridStorageService {
       const session: AuthSession = {
         isVerified: isVerified === 'true',
         userType,
+        userId,
         loginTimestamp: parseInt(loginTimestamp, 10),
         sessionExpiry: parseInt(sessionExpiry, 10),
       }
@@ -180,6 +198,7 @@ class HybridStorageService {
       console.log('🔍 PARSED SESSION DATA:', {
         isVerified: session.isVerified,
         userType: session.userType,
+        userId: session.userId,
         loginTimestamp: new Date(session.loginTimestamp).toLocaleString(),
         sessionExpiry: new Date(session.sessionExpiry).toLocaleString(),
         isExpired: session.sessionExpiry < Date.now(),
@@ -210,23 +229,20 @@ class HybridStorageService {
   }
 
   /**
-   * Clear all authentication data from storage
+   * Clear all authentication data
    */
   async clearAuthSession(): Promise<void> {
     try {
-      console.log('🧹 CLEARING AUTH SESSION FROM HYBRID STORAGE')
-
       await Promise.all([
         this.deleteItem(AUTH_KEYS.IS_VERIFIED),
         this.deleteItem(AUTH_KEYS.USER_TYPE),
+        this.deleteItem(AUTH_KEYS.USER_ID),
         this.deleteItem(AUTH_KEYS.LOGIN_TIMESTAMP),
         this.deleteItem(AUTH_KEYS.SESSION_EXPIRY),
       ])
-
-      console.log('✅ AUTH SESSION CLEARED SUCCESSFULLY')
+      console.log('✅ Auth session cleared from hybrid storage')
     } catch (error) {
-      console.error('❌ FAILED TO CLEAR AUTH SESSION:', error)
-      // Don't throw error as this might be called during logout
+      console.error('❌ Failed to clear auth session:', error)
     }
   }
 
@@ -236,15 +252,11 @@ class HybridStorageService {
   async extendSession(): Promise<void> {
     try {
       const session = await this.getAuthSession()
-      if (!session) {
-        console.log('No session to extend')
-        return
-      }
+      if (!session) return
 
       const newExpiry = Date.now() + SESSION_DURATION
       await this.setItem(AUTH_KEYS.SESSION_EXPIRY, newExpiry.toString())
-
-      console.log('Session extended successfully')
+      console.log('✅ Session extended successfully')
     } catch (error) {
       console.error('Failed to extend session:', error)
     }

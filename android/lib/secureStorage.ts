@@ -4,6 +4,7 @@ import * as SecureStore from 'expo-secure-store'
 const AUTH_KEYS = {
   IS_VERIFIED: 'user_verified',
   USER_TYPE: 'user_type',
+  USER_ID: 'user_id',
   LOGIN_TIMESTAMP: 'login_timestamp',
   SESSION_EXPIRY: 'session_expiry',
 } as const
@@ -14,6 +15,7 @@ const SESSION_DURATION = 30 * 24 * 60 * 60 * 1000
 export interface AuthSession {
   isVerified: boolean
   userType?: string
+  userId?: string
   loginTimestamp: number
   sessionExpiry: number
 }
@@ -22,7 +24,7 @@ class SecureStorageService {
   /**
    * Store user verification status after successful OTP verification
    */
-  async setUserVerified(userType: string): Promise<void> {
+  async setUserVerified(userType: string, userId: string): Promise<void> {
     try {
       const timestamp = Date.now()
       const expiry = timestamp + SESSION_DURATION
@@ -30,6 +32,7 @@ class SecureStorageService {
       console.log('💾 SAVING VERIFICATION DATA TO SECURE STORAGE')
       console.log('Data to save:', {
         userType,
+        userId,
         timestamp: new Date(timestamp).toLocaleString(),
         expiry: new Date(expiry).toLocaleString(),
         sessionDurationDays: SESSION_DURATION / (24 * 60 * 60 * 1000),
@@ -38,6 +41,7 @@ class SecureStorageService {
       await Promise.all([
         SecureStore.setItemAsync(AUTH_KEYS.IS_VERIFIED, 'true'),
         SecureStore.setItemAsync(AUTH_KEYS.USER_TYPE, userType),
+        SecureStore.setItemAsync(AUTH_KEYS.USER_ID, userId),
         SecureStore.setItemAsync(AUTH_KEYS.LOGIN_TIMESTAMP, timestamp.toString()),
         SecureStore.setItemAsync(AUTH_KEYS.SESSION_EXPIRY, expiry.toString()),
       ])
@@ -48,6 +52,7 @@ class SecureStorageService {
       const verification = await Promise.all([
         SecureStore.getItemAsync(AUTH_KEYS.IS_VERIFIED),
         SecureStore.getItemAsync(AUTH_KEYS.USER_TYPE),
+        SecureStore.getItemAsync(AUTH_KEYS.USER_ID),
         SecureStore.getItemAsync(AUTH_KEYS.LOGIN_TIMESTAMP),
         SecureStore.getItemAsync(AUTH_KEYS.SESSION_EXPIRY),
       ])
@@ -55,8 +60,9 @@ class SecureStorageService {
       console.log('🔍 VERIFICATION - Data read back:', {
         isVerified: verification[0],
         userType: verification[1],
-        loginTimestamp: verification[2],
-        sessionExpiry: verification[3],
+        userId: verification[2],
+        loginTimestamp: verification[3],
+        sessionExpiry: verification[4],
       })
     } catch (error) {
       console.error('❌ FAILED TO SAVE VERIFICATION STATUS:', error)
@@ -71,9 +77,10 @@ class SecureStorageService {
     try {
       console.log('📖 READING AUTH SESSION FROM SECURE STORAGE')
 
-      const [isVerified, userType, loginTimestamp, sessionExpiry] = await Promise.all([
+      const [isVerified, userType, userId, loginTimestamp, sessionExpiry] = await Promise.all([
         SecureStore.getItemAsync(AUTH_KEYS.IS_VERIFIED),
         SecureStore.getItemAsync(AUTH_KEYS.USER_TYPE),
+        SecureStore.getItemAsync(AUTH_KEYS.USER_ID),
         SecureStore.getItemAsync(AUTH_KEYS.LOGIN_TIMESTAMP),
         SecureStore.getItemAsync(AUTH_KEYS.SESSION_EXPIRY),
       ])
@@ -81,11 +88,12 @@ class SecureStorageService {
       console.log('📦 Raw data from secure storage:', {
         isVerified,
         userType,
+        userId,
         loginTimestamp,
         sessionExpiry,
       })
 
-      if (!isVerified || !userType || !loginTimestamp || !sessionExpiry) {
+      if (!isVerified || !userType || !userId || !loginTimestamp || !sessionExpiry) {
         console.log('❌ INCOMPLETE SESSION DATA - some values are missing')
         return null
       }
@@ -93,6 +101,7 @@ class SecureStorageService {
       const session: AuthSession = {
         isVerified: isVerified === 'true',
         userType,
+        userId,
         loginTimestamp: parseInt(loginTimestamp, 10),
         sessionExpiry: parseInt(sessionExpiry, 10),
       }
@@ -100,6 +109,7 @@ class SecureStorageService {
       console.log('🔍 PARSED SESSION DATA:', {
         isVerified: session.isVerified,
         userType: session.userType,
+        userId: session.userId,
         loginTimestamp: new Date(session.loginTimestamp).toLocaleString(),
         sessionExpiry: new Date(session.sessionExpiry).toLocaleString(),
         isExpired: session.sessionExpiry < Date.now(),
@@ -130,41 +140,33 @@ class SecureStorageService {
   }
 
   /**
-   * Clear all authentication data from secure storage
+   * Clear all authentication data
    */
   async clearAuthSession(): Promise<void> {
     try {
-      console.log('🧹 CLEARING AUTH SESSION FROM SECURE STORAGE')
-
       await Promise.all([
         SecureStore.deleteItemAsync(AUTH_KEYS.IS_VERIFIED),
         SecureStore.deleteItemAsync(AUTH_KEYS.USER_TYPE),
+        SecureStore.deleteItemAsync(AUTH_KEYS.USER_ID),
         SecureStore.deleteItemAsync(AUTH_KEYS.LOGIN_TIMESTAMP),
         SecureStore.deleteItemAsync(AUTH_KEYS.SESSION_EXPIRY),
       ])
-
-      console.log('✅ AUTH SESSION CLEARED SUCCESSFULLY')
+      console.log('✅ Auth session cleared from SecureStore')
     } catch (error) {
-      console.error('❌ FAILED TO CLEAR AUTH SESSION:', error)
-      // Don't throw error as this might be called during logout
+      console.error('❌ Failed to clear auth session:', error)
     }
   }
 
   /**
-   * Extend current session expiry (useful for activity-based session extension)
+   * Extend current session expiry
    */
   async extendSession(): Promise<void> {
     try {
       const session = await this.getAuthSession()
-      if (!session) {
-        console.log('No session to extend')
-        return
-      }
+      if (!session) return
 
       const newExpiry = Date.now() + SESSION_DURATION
       await SecureStore.setItemAsync(AUTH_KEYS.SESSION_EXPIRY, newExpiry.toString())
-
-      console.log('Session extended successfully')
     } catch (error) {
       console.error('Failed to extend session:', error)
     }
