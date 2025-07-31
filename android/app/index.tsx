@@ -46,6 +46,10 @@ const index = () => {
           console.log('- Session exists:', !!authSession)
           console.log('- User type:', authSession.userType)
           console.log(
+            '- Session expiry:',
+            new Date(authSession.sessionExpiry).toLocaleString(),
+          )
+          console.log(
             '- Firebase user status:',
             !!user,
             '(not required for auto-login)',
@@ -53,9 +57,17 @@ const index = () => {
 
           // Use stored user type from auth session for faster routing
           const route = getUserRoutes({ type: authSession.userType as any })
-          console.log('🚀 AUTO LOGIN: Redirecting to', route)
-          router.replace(route)
-          return
+          console.log('🚀 AUTO LOGIN: Attempting redirect to', route)
+
+          try {
+            router.replace(route)
+            console.log('✅ Auto login redirect initiated successfully')
+            return
+          } catch (error) {
+            console.error('❌ Auto login redirect failed:', error)
+            setError(new Error('Auto login redirect failed'))
+            return
+          }
         }
 
         console.log('❌ Auto login failed - showing splash screen')
@@ -142,9 +154,7 @@ const index = () => {
               <View className="gap-6 mb-5">
                 <View>
                   <Typo className="text-center text-3xl font-bold text-white mb-2">
-                    Face Recognition Security System test -{' '}
-                    {authSession?.userType} - {authSession?.isVerified} -{' '}
-                    {authSession?.loginTimestamp} - {authSession?.sessionExpiry}
+                    Face Recognition Security System
                   </Typo>
                 </View>
                 <View className="bg-white/10 p-6 rounded-2xl border border-white/10">
