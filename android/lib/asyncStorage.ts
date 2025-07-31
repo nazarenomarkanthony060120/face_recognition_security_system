@@ -67,7 +67,7 @@ class AsyncStorageService {
 
       const session: AuthSession = {
         isVerified: isVerified === 'true',
-        userType: userType === 'user' ? 'user' : 'admin',
+        userType: userType === 'User' ? 'User' : 'Administrator',
         loginTimestamp: parseInt(loginTimestamp, 10),
         sessionExpiry: parseInt(sessionExpiry, 10),
       }
