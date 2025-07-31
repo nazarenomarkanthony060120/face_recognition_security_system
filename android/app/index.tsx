@@ -144,7 +144,9 @@ const index = () => {
               <View className="gap-6 mb-5">
                 <View>
                   <Typo className="text-center text-3xl font-bold text-white mb-2">
-                    Face Recognition Security System
+                    Face Recognition Security System - {authSession?.userType} -{' '}
+                    {authSession?.isVerified} - {authSession?.loginTimestamp} -{' '}
+                    {authSession?.sessionExpiry}
                   </Typo>
                 </View>
                 <View className="bg-white/10 p-6 rounded-2xl border border-white/10">
