@@ -110,7 +110,7 @@ const DashboardHeader = () => {
           </View>
         </View>
 
-        <View className="flex-1 bg-white/10 p-4 rounded-xl border border-white/10">
+        {/* <View className="flex-1 bg-white/10 p-4 rounded-xl border border-white/10">
           <View className="flex-row items-center justify-between">
             <View>
               <Typo className="text-2xl font-bold text-white">
@@ -144,7 +144,7 @@ const DashboardHeader = () => {
               <MaterialIcons name="cancel" size={24} color="#EF4444" />
             </View>
           </View>
-        </View>
+        </View> */}
       </View>
     </View>
   )
