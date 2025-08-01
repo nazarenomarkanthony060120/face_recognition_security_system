@@ -5,7 +5,7 @@ import Typo from '@/components/typo'
 import Button from '@/components/button'
 import {
   sendDiscordErrorNotification,
-  createErrorNotification,
+  createEnhancedErrorNotification,
 } from '@/utils/discordNotification'
 
 interface Props {
@@ -31,20 +31,16 @@ class ErrorBoundary extends Component<Props, State> {
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     console.error('ErrorBoundary caught an error:', error, errorInfo)
+    console.error('Error stack:', error.stack)
+    console.error('Component stack:', errorInfo.componentStack)
 
-    // Send Discord notification for unhandled React error
-    const errorNotification = createErrorNotification(
+    // Send Discord notification for unhandled React error with enhanced details
+    const errorNotification = createEnhancedErrorNotification(
       this.props.errorContext || 'DASHBOARD',
-      `Unhandled React error: ${error.message}`,
+      error,
       {
-        additionalContext: {
-          errorName: error.name,
-          errorMessage: error.message,
-          errorStack: error.stack,
-          componentStack: errorInfo.componentStack,
-          errorBoundaryContext: this.props.errorContext || 'DASHBOARD',
-          timestamp: new Date().toISOString(),
-        },
+        context: `React ErrorBoundary in ${this.props.errorContext || 'DASHBOARD'}`,
+        componentStack: errorInfo.componentStack || undefined,
       },
     )
     sendDiscordErrorNotification(errorNotification)

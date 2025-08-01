@@ -75,12 +75,51 @@ export const sendDiscordErrorNotification = async (data: ErrorNotificationData) 
       }
     }
 
-    // Add additional context if available
-    if (data.additionalContext) {
-      const contextString = JSON.stringify(data.additionalContext, null, 2)
-      if (contextString.length < 1024) { // Discord field value limit
+    // Add stack trace prominently if available
+    if (data.additionalContext?.errorStack || data.additionalContext?.error?.stack) {
+      const stackTrace = data.additionalContext.errorStack || data.additionalContext.error?.stack
+      if (stackTrace && typeof stackTrace === 'string') {
+        // Truncate stack trace if too long (Discord field limit is 1024 chars)
+        const truncatedStack = stackTrace.length > 900
+          ? stackTrace.substring(0, 900) + '...\n[Stack trace truncated]'
+          : stackTrace
+
         embed.fields.push({
-          name: "🔍 Additional Context",
+          name: "🔍 Stack Trace",
+          value: `\`\`\`\n${truncatedStack}\n\`\`\``,
+          inline: false
+        })
+      }
+    }
+
+    // Add component stack for React errors
+    if (data.additionalContext?.componentStack) {
+      const componentStack = data.additionalContext.componentStack
+      if (componentStack && typeof componentStack === 'string') {
+        const truncatedComponentStack = componentStack.length > 900
+          ? componentStack.substring(0, 900) + '...\n[Component stack truncated]'
+          : componentStack
+
+        embed.fields.push({
+          name: "⚛️ Component Stack",
+          value: `\`\`\`\n${truncatedComponentStack}\n\`\`\``,
+          inline: false
+        })
+      }
+    }
+
+    // Add other additional context (excluding stack traces to avoid duplication)
+    if (data.additionalContext) {
+      const contextCopy = { ...data.additionalContext }
+      // Remove stack traces from general context since we show them separately
+      delete contextCopy.errorStack
+      delete contextCopy.componentStack
+      delete contextCopy.error?.stack
+
+      const contextString = JSON.stringify(contextCopy, null, 2)
+      if (contextString !== '{}' && contextString.length < 800) {
+        embed.fields.push({
+          name: "📋 Additional Context",
           value: `\`\`\`json\n${contextString}\n\`\`\``,
           inline: false
         })
@@ -94,7 +133,8 @@ export const sendDiscordErrorNotification = async (data: ErrorNotificationData) 
     console.log('📤 Sending error notification to Discord...', {
       errorType: data.errorType,
       errorMessage: data.errorMessage,
-      timestamp: data.timestamp
+      timestamp: data.timestamp,
+      hasStackTrace: !!(data.additionalContext?.errorStack || data.additionalContext?.error?.stack)
     })
 
     const response = await fetch(DISCORD_WEBHOOK_URL, {
@@ -151,4 +191,88 @@ export const createErrorNotification = (
     timestamp: new Date().toISOString(),
     additionalContext: options?.additionalContext
   }
+}
+
+// Helper function to create enhanced error notification for JavaScript errors
+export const createEnhancedErrorNotification = (
+  errorType: ErrorNotificationData['errorType'],
+  error: Error,
+  options?: {
+    userInfo?: ErrorNotificationData['userInfo']
+    context?: string
+    componentStack?: string
+  }
+): ErrorNotificationData => {
+  // Extract more details from the error
+  const errorDetails = {
+    name: error.name,
+    message: error.message,
+    stack: error.stack,
+    // Try to extract the specific line and file from stack trace
+    sourceLine: extractSourceLineFromStack(error.stack),
+    // Check if it's a common undefined property access error
+    isPropertyAccessError: error.message.includes('Cannot read property') || error.message.includes('Cannot read properties'),
+  }
+
+  return {
+    errorType,
+    errorMessage: `${error.name}: ${error.message}`,
+    userInfo: options?.userInfo,
+    deviceInfo: getDeviceInfo(),
+    timestamp: new Date().toISOString(),
+    additionalContext: {
+      error: errorDetails,
+      errorStack: error.stack,
+      componentStack: options?.componentStack,
+      context: options?.context,
+      errorAnalysis: {
+        likelyUndefinedProperty: errorDetails.isPropertyAccessError ? extractUndefinedProperty(error.message) : null,
+        errorCategory: categorizeError(error),
+      }
+    }
+  }
+}
+
+// Helper to extract which property was undefined
+const extractUndefinedProperty = (message: string): string | null => {
+  const match = message.match(/Cannot read propert(?:y|ies) ['"]([^'"]+)['"]/)
+  return match ? match[1] : null
+}
+
+// Helper to extract source file and line from stack trace
+const extractSourceLineFromStack = (stack?: string): string | null => {
+  if (!stack) return null
+
+  const lines = stack.split('\n')
+  for (const line of lines) {
+    // Look for app source files (not node_modules)
+    if (line.includes('.tsx') || line.includes('.ts')) {
+      const match = line.match(/\(([^)]+)\)/)
+      return match ? match[1] : line.trim()
+    }
+  }
+  return null
+}
+
+// Helper to categorize error types
+const categorizeError = (error: Error): string => {
+  if (error.message.includes('Cannot read property') || error.message.includes('Cannot read properties')) {
+    return 'UNDEFINED_PROPERTY_ACCESS'
+  }
+  if (error.message.includes('Cannot set property')) {
+    return 'UNDEFINED_PROPERTY_SET'
+  }
+  if (error.message.includes('is not a function')) {
+    return 'FUNCTION_NOT_FOUND'
+  }
+  if (error.message.includes('Network')) {
+    return 'NETWORK_ERROR'
+  }
+  if (error.name === 'TypeError') {
+    return 'TYPE_ERROR'
+  }
+  if (error.name === 'ReferenceError') {
+    return 'REFERENCE_ERROR'
+  }
+  return 'UNKNOWN_ERROR'
 } 

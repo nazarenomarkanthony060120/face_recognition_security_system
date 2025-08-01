@@ -1,5 +1,7 @@
 import * as SecureStore from 'expo-secure-store'
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import { secureStorage } from './secureStorage'
+import { logToDiscord } from '@/utils/discordLogger'
 
 // Keys for storing authentication data
 const AUTH_KEYS = {
@@ -117,15 +119,9 @@ class HybridStorageService {
       const timestamp = Date.now()
       const expiry = timestamp + SESSION_DURATION
 
-      console.log('💾 SAVING VERIFICATION DATA TO HYBRID STORAGE')
-      console.log('Storage method:', this.useSecureStore ? 'SecureStore (primary)' : 'AsyncStorage (fallback)')
-      console.log('Data to save:', {
-        userType,
-        userId,
-        timestamp: new Date(timestamp).toLocaleString(),
-        expiry: new Date(expiry).toLocaleString(),
-        sessionDurationDays: SESSION_DURATION / (24 * 60 * 60 * 1000),
-      })
+      logToDiscord.log('💾 SAVING VERIFICATION DATA TO HYBRID STORAGE', 'hybridStorage.ts', 'setUserVerified')
+      logToDiscord.log(`Storage method: ${this.useSecureStore ? 'SecureStore (primary)' : 'AsyncStorage (fallback)'}`, 'hybridStorage.ts', 'setUserVerified')
+      logToDiscord.log(`Data to save: userType=${userType}, userId=${userId}, timestamp=${new Date(timestamp).toLocaleString()}, expiry=${new Date(expiry).toLocaleString()}, sessionDurationDays=${SESSION_DURATION / (24 * 60 * 60 * 1000)}`, 'hybridStorage.ts', 'setUserVerified')
 
       await Promise.all([
         this.setItem(AUTH_KEYS.IS_VERIFIED, 'true'),
@@ -135,7 +131,7 @@ class HybridStorageService {
         this.setItem(AUTH_KEYS.SESSION_EXPIRY, expiry.toString()),
       ])
 
-      console.log('✅ ALL VERIFICATION DATA SAVED SUCCESSFULLY')
+      logToDiscord.log('✅ ALL VERIFICATION DATA SAVED SUCCESSFULLY', 'hybridStorage.ts', 'setUserVerified')
 
       // Verify the data was saved by reading it back
       const verification = await Promise.all([
@@ -146,15 +142,9 @@ class HybridStorageService {
         this.getItem(AUTH_KEYS.SESSION_EXPIRY),
       ])
 
-      console.log('🔍 VERIFICATION - Data read back:', {
-        isVerified: verification[0],
-        userType: verification[1],
-        userId: verification[2],
-        loginTimestamp: verification[3],
-        sessionExpiry: verification[4],
-      })
+      logToDiscord.log(`🔍 VERIFICATION - Data read back: isVerified=${verification[0]}, userType=${verification[1]}, userId=${verification[2]}, loginTimestamp=${verification[3]}, sessionExpiry=${verification[4]}`, 'hybridStorage.ts', 'setUserVerified')
     } catch (error) {
-      console.error('❌ FAILED TO SAVE VERIFICATION STATUS:', error)
+      logToDiscord.error(`❌ FAILED TO SAVE VERIFICATION STATUS: ${error}`, 'hybridStorage.ts', 'setUserVerified')
       throw error
     }
   }
@@ -164,7 +154,7 @@ class HybridStorageService {
    */
   async getAuthSession(): Promise<AuthSession | null> {
     try {
-      console.log('📖 READING AUTH SESSION FROM HYBRID STORAGE')
+      logToDiscord.log('📖 READING AUTH SESSION FROM HYBRID STORAGE', 'hybridStorage.ts', 'getAuthSession')
 
       const [isVerified, userType, userId, loginTimestamp, sessionExpiry] = await Promise.all([
         this.getItem(AUTH_KEYS.IS_VERIFIED),
@@ -174,16 +164,10 @@ class HybridStorageService {
         this.getItem(AUTH_KEYS.SESSION_EXPIRY),
       ])
 
-      console.log('📦 Raw data from storage:', {
-        isVerified,
-        userType,
-        userId,
-        loginTimestamp,
-        sessionExpiry,
-      })
+      logToDiscord.log(`📦 Raw data from storage: isVerified=${isVerified}, userType=${userType}, userId=${userId}, loginTimestamp=${loginTimestamp}, sessionExpiry=${sessionExpiry}`, 'hybridStorage.ts', 'getAuthSession')
 
       if (!isVerified || !userType || !userId || !loginTimestamp || !sessionExpiry) {
-        console.log('❌ INCOMPLETE SESSION DATA - some values are missing')
+        logToDiscord.log('❌ INCOMPLETE SESSION DATA - some values are missing', 'hybridStorage.ts', 'getAuthSession')
         return null
       }
 
@@ -195,27 +179,19 @@ class HybridStorageService {
         sessionExpiry: parseInt(sessionExpiry, 10),
       }
 
-      console.log('🔍 PARSED SESSION DATA:', {
-        isVerified: session.isVerified,
-        userType: session.userType,
-        userId: session.userId,
-        loginTimestamp: new Date(session.loginTimestamp).toLocaleString(),
-        sessionExpiry: new Date(session.sessionExpiry).toLocaleString(),
-        isExpired: session.sessionExpiry < Date.now(),
-        daysUntilExpiry: Math.ceil((session.sessionExpiry - Date.now()) / (24 * 60 * 60 * 1000)),
-      })
+      logToDiscord.log(`🔍 PARSED SESSION DATA: isVerified=${session.isVerified}, userType=${session.userType}, userId=${session.userId}, loginTimestamp=${new Date(session.loginTimestamp).toLocaleString()}, sessionExpiry=${new Date(session.sessionExpiry).toLocaleString()}, isExpired=${session.sessionExpiry < Date.now()}, daysUntilExpiry=${Math.ceil((session.sessionExpiry - Date.now()) / (24 * 60 * 60 * 1000))}`, 'hybridStorage.ts', 'getAuthSession')
 
       // Check if session has expired
       if (session.sessionExpiry < Date.now()) {
-        console.log('⏰ SESSION HAS EXPIRED - clearing session')
+        logToDiscord.log('⏰ SESSION HAS EXPIRED - clearing session', 'hybridStorage.ts', 'getAuthSession')
         await this.clearAuthSession()
         return null
       }
 
-      console.log('✅ VALID SESSION FOUND')
+      logToDiscord.log('✅ VALID SESSION FOUND', 'hybridStorage.ts', 'getAuthSession')
       return session
     } catch (error) {
-      console.error('❌ FAILED TO GET AUTH SESSION:', error)
+      logToDiscord.error(`❌ FAILED TO GET AUTH SESSION: ${error}`, 'hybridStorage.ts', 'getAuthSession')
       return null
     }
   }
@@ -233,6 +209,8 @@ class HybridStorageService {
    */
   async clearAuthSession(): Promise<void> {
     try {
+      logToDiscord.log('🧹 CLEARING AUTH SESSION FROM HYBRID STORAGE', 'hybridStorage.ts', 'clearAuthSession')
+
       await Promise.all([
         this.deleteItem(AUTH_KEYS.IS_VERIFIED),
         this.deleteItem(AUTH_KEYS.USER_TYPE),
@@ -240,9 +218,11 @@ class HybridStorageService {
         this.deleteItem(AUTH_KEYS.LOGIN_TIMESTAMP),
         this.deleteItem(AUTH_KEYS.SESSION_EXPIRY),
       ])
-      console.log('✅ Auth session cleared from hybrid storage')
+
+      logToDiscord.log('✅ AUTH SESSION CLEARED SUCCESSFULLY', 'hybridStorage.ts', 'clearAuthSession')
     } catch (error) {
-      console.error('❌ Failed to clear auth session:', error)
+      logToDiscord.error(`❌ FAILED TO CLEAR AUTH SESSION: ${error}`, 'hybridStorage.ts', 'clearAuthSession')
+      throw error
     }
   }
 
@@ -251,14 +231,15 @@ class HybridStorageService {
    */
   async extendSession(): Promise<void> {
     try {
-      const session = await this.getAuthSession()
-      if (!session) return
+      logToDiscord.log('🔄 EXTENDING SESSION EXPIRY', 'hybridStorage.ts', 'extendSession')
 
       const newExpiry = Date.now() + SESSION_DURATION
       await this.setItem(AUTH_KEYS.SESSION_EXPIRY, newExpiry.toString())
-      console.log('✅ Session extended successfully')
+
+      logToDiscord.log(`✅ SESSION EXTENDED UNTIL: ${new Date(newExpiry).toLocaleString()}`, 'hybridStorage.ts', 'extendSession')
     } catch (error) {
-      console.error('Failed to extend session:', error)
+      logToDiscord.error(`❌ FAILED TO EXTEND SESSION: ${error}`, 'hybridStorage.ts', 'extendSession')
+      throw error
     }
   }
 

@@ -15,6 +15,7 @@ import {
   sendDiscordErrorNotification,
   createErrorNotification,
 } from '@/utils/discordNotification'
+import { logToDiscord } from '@/utils/discordLogger'
 
 const index = () => {
   const router = useRouter()
@@ -32,51 +33,89 @@ const index = () => {
   useEffect(() => {
     const initializeApp = async () => {
       try {
-        console.log('🚀 App initialization started')
-        console.log('Auth state:', {
-          loading,
-          isInitialized,
-          hasUser: !!user,
-          userEmail: user?.email,
-          isVerified,
-          hasAuthSession: !!authSession,
-          sessionUserType: authSession?.userType,
-        })
+        logToDiscord.log(
+          '🚀 App initialization started',
+          'index.tsx',
+          'initializeApp',
+        )
+        logToDiscord.log(
+          `Auth state: loading=${loading}, isInitialized=${isInitialized}, hasUser=${!!user}, userEmail=${user?.email}, isVerified=${isVerified}, hasAuthSession=${!!authSession}, sessionUserType=${authSession?.userType}`,
+          'index.tsx',
+          'initializeApp',
+        )
 
         // Wait for auth to finish loading and initialization to complete
         if (loading || !isInitialized) {
-          console.log('⏳ Waiting for auth initialization...')
+          logToDiscord.log(
+            '⏳ Waiting for auth initialization...',
+            'index.tsx',
+            'initializeApp',
+          )
           return
         }
 
-        console.log('✅ Auth initialization complete')
+        logToDiscord.log(
+          '✅ Auth initialization complete',
+          'index.tsx',
+          'initializeApp',
+        )
 
         // Check for auto login: prioritize session state as source of truth
         if (isVerified && authSession && authSession.userType) {
-          console.log('🎯 Auto login conditions met!')
-          console.log('- Session verified:', isVerified)
-          console.log('- Session exists:', !!authSession)
-          console.log('- User type:', authSession.userType)
-          console.log('- User type typeof:', typeof authSession.userType)
-          console.log(
-            '- Session expiry:',
-            new Date(authSession.sessionExpiry).toLocaleString(),
+          logToDiscord.log(
+            '🎯 Auto login conditions met!',
+            'index.tsx',
+            'autoLogin',
           )
-          console.log(
-            '- Firebase user status:',
-            !!user,
-            '(not required for auto-login)',
+          logToDiscord.log(
+            `- Session verified: ${isVerified}`,
+            'index.tsx',
+            'autoLogin',
+          )
+          logToDiscord.log(
+            `- Session exists: ${!!authSession}`,
+            'index.tsx',
+            'autoLogin',
+          )
+          logToDiscord.log(
+            `- User type: ${authSession.userType}`,
+            'index.tsx',
+            'autoLogin',
+          )
+          logToDiscord.log(
+            `- User type typeof: ${typeof authSession.userType}`,
+            'index.tsx',
+            'autoLogin',
+          )
+          logToDiscord.log(
+            `- Session expiry: ${new Date(authSession.sessionExpiry).toLocaleString()}`,
+            'index.tsx',
+            'autoLogin',
+          )
+          logToDiscord.log(
+            `- Firebase user status: ${!!user} (not required for auto-login)`,
+            'index.tsx',
+            'autoLogin',
           )
 
           // Validate userType against enum values
           const validUserTypes = Object.values(UserType)
           if (!validUserTypes.includes(authSession.userType as UserType)) {
-            console.error(
-              '❌ Invalid user type in session:',
-              authSession.userType,
+            logToDiscord.error(
+              `❌ Invalid user type in session: ${authSession.userType}`,
+              'index.tsx',
+              'autoLogin',
             )
-            console.error('❌ Valid types are:', validUserTypes)
-            console.log('🧹 Clearing invalid session data...')
+            logToDiscord.error(
+              `❌ Valid types are: ${validUserTypes.join(', ')}`,
+              'index.tsx',
+              'autoLogin',
+            )
+            logToDiscord.log(
+              '🧹 Clearing invalid session data...',
+              'index.tsx',
+              'autoLogin',
+            )
 
             // Send Discord notification for invalid session
             const errorNotification = createErrorNotification(
@@ -111,19 +150,39 @@ const index = () => {
 
           // Ensure the userType is properly typed instead of casting as any
           const userType = authSession.userType as UserType
-          console.log('🔍 Processed user type:', userType)
-          console.log('🔍 Available UserType enum values:', validUserTypes)
+          logToDiscord.log(
+            `🔍 Processed user type: ${userType}`,
+            'index.tsx',
+            'autoLogin',
+          )
+          logToDiscord.log(
+            `🔍 Available UserType enum values: ${validUserTypes.join(', ')}`,
+            'index.tsx',
+            'autoLogin',
+          )
 
           // Use stored user type from auth session for faster routing
           const route = getUserRoutes({ type: userType })
-          console.log('🚀 AUTO LOGIN: Attempting redirect to', route)
+          logToDiscord.log(
+            `🚀 AUTO LOGIN: Attempting redirect to ${route}`,
+            'index.tsx',
+            'autoLogin',
+          )
 
           try {
             router.replace(route)
-            console.log('✅ Auto login redirect initiated successfully')
+            logToDiscord.log(
+              '✅ Auto login redirect initiated successfully',
+              'index.tsx',
+              'autoLogin',
+            )
             return
           } catch (error) {
-            console.error('❌ Auto login redirect failed:', error)
+            logToDiscord.error(
+              `❌ Auto login redirect failed: ${error}`,
+              'index.tsx',
+              'autoLogin',
+            )
 
             // Send Discord notification for redirect failure
             const errorNotification = createErrorNotification(
@@ -154,17 +213,41 @@ const index = () => {
           }
         }
 
-        console.log('❌ Auto login failed - showing splash screen')
-        console.log('Reasons:')
-        console.log('- Is verified:', isVerified)
-        console.log('- Has session:', !!authSession)
-        console.log('- Session user type:', authSession?.userType)
-        console.log('- Firebase user (info only):', !!user)
+        logToDiscord.log(
+          '❌ Auto login failed - showing splash screen',
+          'index.tsx',
+          'initializeApp',
+        )
+        logToDiscord.log('Reasons:', 'index.tsx', 'initializeApp')
+        logToDiscord.log(
+          `- Is verified: ${isVerified}`,
+          'index.tsx',
+          'initializeApp',
+        )
+        logToDiscord.log(
+          `- Has session: ${!!authSession}`,
+          'index.tsx',
+          'initializeApp',
+        )
+        logToDiscord.log(
+          `- Session user type: ${authSession?.userType}`,
+          'index.tsx',
+          'initializeApp',
+        )
+        logToDiscord.log(
+          `- Firebase user (info only): ${!!user}`,
+          'index.tsx',
+          'initializeApp',
+        )
 
         // User is not authenticated or not verified, show splash screen
         setIsLoading(false)
       } catch (err) {
-        console.error('App initialization error:', err)
+        logToDiscord.error(
+          `App initialization error: ${err}`,
+          'index.tsx',
+          'initializeApp',
+        )
 
         // Send Discord notification for app initialization error
         const errorNotification = createErrorNotification(

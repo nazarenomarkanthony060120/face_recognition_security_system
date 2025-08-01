@@ -10,7 +10,11 @@ import { useSearch } from '../context/SearchContext'
 const DashboardFormContents = () => {
   const auth = useAuth()
   const { searchQuery } = useSearch()
-  const { data: students, isLoading } = useFetchAllStudents({
+  const {
+    data: students,
+    isLoading,
+    error,
+  } = useFetchAllStudents({
     id: auth.getUserId?.(),
   })
 
@@ -19,18 +23,37 @@ const DashboardFormContents = () => {
     if (!searchQuery) return students
 
     const query = searchQuery.toLowerCase()
-    return students.filter(
-      (student) =>
-        student.name.toLowerCase().includes(query) ||
-        student.studentId.toLowerCase().includes(query),
-    )
+    return students.filter((student) => {
+      // Add defensive checks to prevent undefined property access
+      const studentName = student?.name || ''
+      const studentId = student?.studentId || ''
+
+      return (
+        studentName.toLowerCase().includes(query) ||
+        studentId.toLowerCase().includes(query)
+      )
+    })
   }, [students, searchQuery])
+
+  // Log error for debugging
+  if (error) {
+    console.error('Error fetching students:', error)
+  }
 
   if (isLoading) {
     return (
       <View className="flex-1 items-center justify-center py-10">
         <ActivityIndicator size="large" color="#ffffff" />
         <Typo className="text-white mt-4">Loading students...</Typo>
+      </View>
+    )
+  }
+
+  if (error) {
+    return (
+      <View className="flex-1 items-center justify-center py-10">
+        <Typo className="text-red-400 text-lg">Error loading students</Typo>
+        <Typo className="text-gray-400 mt-2">Please try refreshing</Typo>
       </View>
     )
   }
@@ -59,7 +82,7 @@ const DashboardFormContents = () => {
     <View className="flex-1">
       <FlashList
         data={filteredStudents}
-        renderItem={({ item }) => <ViewLists key={item.id} data={item} />}
+        renderItem={({ item }) => <ViewLists key={item.id} student={item} />}
         estimatedItemSize={100}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 20 }}

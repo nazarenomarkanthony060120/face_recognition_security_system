@@ -3,6 +3,7 @@ import { auth, onAuthStateChanged, User } from '@/lib/firestore'
 import { useRouter } from 'expo-router'
 import { hybridStorage, AuthSession } from '@/lib/hybridStorage'
 import { UserType } from '@/utils/types'
+import { logToDiscord } from '@/utils/discordLogger'
 
 type ContextProps = {
   user: User | null
@@ -33,30 +34,34 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   const checkAuthStatus = async () => {
     try {
-      console.log('🔍 Checking auth status from HybridStorage...')
+      logToDiscord.log(
+        '🔍 Checking auth status from HybridStorage...',
+        'auth.tsx',
+        'checkAuthStatus',
+      )
       const session = await hybridStorage.getAuthSession()
-      console.log('📦 Retrieved session:', {
-        hasSession: !!session,
-        isVerified: session?.isVerified,
-        userType: session?.userType,
-        userId: session?.userId,
-        expiryDate: session?.sessionExpiry
-          ? new Date(session.sessionExpiry).toLocaleString()
-          : null,
-      })
+      logToDiscord.log(
+        `📦 Retrieved session: hasSession=${!!session}, isVerified=${session?.isVerified}, userType=${session?.userType}, userId=${session?.userId}, expiryDate=${session?.sessionExpiry ? new Date(session.sessionExpiry).toLocaleString() : null}`,
+        'auth.tsx',
+        'checkAuthStatus',
+      )
 
       setAuthSession(session)
       setIsVerified(session?.isVerified === true)
 
-      console.log('✅ Auth status updated:', {
-        isVerified: session?.isVerified === true,
-        hasSession: !!session,
-        userId: session?.userId,
-      })
+      logToDiscord.log(
+        `✅ Auth status updated: isVerified=${session?.isVerified === true}, hasSession=${!!session}, userId=${session?.userId}`,
+        'auth.tsx',
+        'checkAuthStatus',
+      )
 
       return session
     } catch (error) {
-      console.error('❌ Failed to check auth status:', error)
+      logToDiscord.error(
+        `❌ Failed to check auth status: ${error}`,
+        'auth.tsx',
+        'checkAuthStatus',
+      )
       setAuthSession(null)
       setIsVerified(false)
       return null
@@ -65,9 +70,21 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   const setUserVerified = async (userType: string) => {
     try {
-      console.log('💾 Saving user verification to HybridStorage...')
-      console.log('📋 User type being saved:', userType)
-      console.log('📋 User type typeof:', typeof userType)
+      logToDiscord.log(
+        '💾 Saving user verification to HybridStorage...',
+        'auth.tsx',
+        'setUserVerified',
+      )
+      logToDiscord.log(
+        `📋 User type being saved: ${userType}`,
+        'auth.tsx',
+        'setUserVerified',
+      )
+      logToDiscord.log(
+        `📋 User type typeof: ${typeof userType}`,
+        'auth.tsx',
+        'setUserVerified',
+      )
 
       if (!user?.uid) {
         throw new Error('Firebase user not available for saving verification')
@@ -76,16 +93,32 @@ export function AuthProvider({ children }: AuthProviderProps) {
       // Validate that the userType is a valid UserType enum value
       const validUserTypes = Object.values(UserType)
       if (!validUserTypes.includes(userType as UserType)) {
-        console.warn('⚠️ Invalid user type provided:', userType)
-        console.warn('⚠️ Valid types are:', validUserTypes)
+        logToDiscord.warn(
+          `⚠️ Invalid user type provided: ${userType}`,
+          'auth.tsx',
+          'setUserVerified',
+        )
+        logToDiscord.warn(
+          `⚠️ Valid types are: ${validUserTypes.join(', ')}`,
+          'auth.tsx',
+          'setUserVerified',
+        )
         throw new Error(`Invalid user type: ${userType}`)
       }
 
       await hybridStorage.setUserVerified(userType, user.uid)
-      console.log('✅ User verification saved, refreshing auth status...')
+      logToDiscord.log(
+        '✅ User verification saved, refreshing auth status...',
+        'auth.tsx',
+        'setUserVerified',
+      )
       await checkAuthStatus() // Refresh auth session
     } catch (error) {
-      console.error('❌ Failed to set user as verified:', error)
+      logToDiscord.error(
+        `❌ Failed to set user as verified: ${error}`,
+        'auth.tsx',
+        'setUserVerified',
+      )
       throw error
     }
   }
@@ -94,26 +127,39 @@ export function AuthProvider({ children }: AuthProviderProps) {
   useEffect(() => {
     const initializeAuth = async () => {
       try {
-        console.log('🚀 Initializing auth - checking stored session first...')
+        logToDiscord.log(
+          '🚀 Initializing auth - checking stored session first...',
+          'auth.tsx',
+          'initializeAuth',
+        )
 
         // First check if we have a valid stored session
         const storedSession = await checkAuthStatus()
 
         if (storedSession && storedSession.isVerified) {
-          console.log(
+          logToDiscord.log(
             '✅ Valid stored session found - user should be auto-logged in',
+            'auth.tsx',
+            'initializeAuth',
           )
-          console.log('📊 Session details:', {
-            userType: storedSession.userType,
-            userId: storedSession.userId,
-            isVerified: storedSession.isVerified,
-            expiresAt: new Date(storedSession.sessionExpiry).toLocaleString(),
-          })
+          logToDiscord.log(
+            `📊 Session details: userType=${storedSession.userType}, userId=${storedSession.userId}, isVerified=${storedSession.isVerified}, expiresAt=${new Date(storedSession.sessionExpiry).toLocaleString()}`,
+            'auth.tsx',
+            'initializeAuth',
+          )
         } else {
-          console.log('❌ No valid stored session found')
+          logToDiscord.log(
+            '❌ No valid stored session found',
+            'auth.tsx',
+            'initializeAuth',
+          )
         }
       } catch (error) {
-        console.error('❌ Failed to initialize auth:', error)
+        logToDiscord.error(
+          `❌ Failed to initialize auth: ${error}`,
+          'auth.tsx',
+          'initializeAuth',
+        )
       }
     }
 
@@ -131,42 +177,62 @@ export function AuthProvider({ children }: AuthProviderProps) {
     const unsubscribe = onAuthStateChanged(
       auth,
       async (firebaseUser) => {
-        console.log('🔥 Firebase auth state changed:', {
-          isLoggedIn: !!firebaseUser,
-          email: firebaseUser?.email,
-          uid: firebaseUser?.uid,
-        })
+        logToDiscord.log(
+          `🔥 Firebase auth state changed: isLoggedIn=${!!firebaseUser}, email=${firebaseUser?.email}, uid=${firebaseUser?.uid}`,
+          'auth.tsx',
+          'onAuthStateChanged',
+        )
 
         setUser(firebaseUser)
 
         if (firebaseUser) {
-          console.log('✅ Firebase user found, syncing with stored session...')
+          logToDiscord.log(
+            '✅ Firebase user found, syncing with stored session...',
+            'auth.tsx',
+            'onAuthStateChanged',
+          )
           // User is authenticated with Firebase, sync with stored session
           await checkAuthStatus()
         } else {
-          console.log('❌ No Firebase user found')
+          logToDiscord.log(
+            '❌ No Firebase user found',
+            'auth.tsx',
+            'onAuthStateChanged',
+          )
           // Only clear stored session if we're sure the user logged out
           // (not on initial load where Firebase might just be slow)
           const storedSession = await hybridStorage.getAuthSession()
           if (!storedSession) {
-            console.log(
+            logToDiscord.log(
               '💡 No stored session either - user is definitely logged out',
+              'auth.tsx',
+              'onAuthStateChanged',
             )
             setIsVerified(false)
             setAuthSession(null)
           } else {
-            console.log(
+            logToDiscord.log(
               '🤔 Firebase user missing but stored session exists - keeping session for now',
+              'auth.tsx',
+              'onAuthStateChanged',
             )
           }
         }
 
         setLoading(false)
         setIsInitialized(true)
-        console.log('🏁 Auth initialization complete')
+        logToDiscord.log(
+          '🏁 Auth initialization complete',
+          'auth.tsx',
+          'onAuthStateChanged',
+        )
       },
       (error) => {
-        console.error('❌ Auth state change error:', error)
+        logToDiscord.error(
+          `❌ Auth state change error: ${error}`,
+          'auth.tsx',
+          'onAuthStateChanged',
+        )
         setLoading(false)
         setIsInitialized(true)
       },
@@ -186,28 +252,40 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   const logout = async () => {
     try {
-      console.log('🚪 Logging out user...')
+      logToDiscord.log('🚪 Logging out user...', 'auth.tsx', 'logout')
       await auth?.signOut()
       await hybridStorage.clearAuthSession()
       setUser(null)
       setIsVerified(false)
       setAuthSession(null)
-      console.log('✅ Logout successful')
+      logToDiscord.log('✅ Logout successful', 'auth.tsx', 'logout')
     } catch (error) {
-      console.error('❌ Logout error:', error)
+      logToDiscord.error(`❌ Logout error: ${error}`, 'auth.tsx', 'logout')
       throw error
     }
   }
 
   const clearInvalidSession = async () => {
     try {
-      console.log('🧹 Clearing invalid session data...')
+      logToDiscord.log(
+        '🧹 Clearing invalid session data...',
+        'auth.tsx',
+        'clearInvalidSession',
+      )
       await hybridStorage.clearAuthSession()
       setIsVerified(false)
       setAuthSession(null)
-      console.log('✅ Invalid session cleared')
+      logToDiscord.log(
+        '✅ Invalid session cleared',
+        'auth.tsx',
+        'clearInvalidSession',
+      )
     } catch (error) {
-      console.error('❌ Failed to clear invalid session:', error)
+      logToDiscord.error(
+        `❌ Failed to clear invalid session: ${error}`,
+        'auth.tsx',
+        'clearInvalidSession',
+      )
     }
   }
 
