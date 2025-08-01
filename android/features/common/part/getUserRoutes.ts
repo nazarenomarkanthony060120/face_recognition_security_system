@@ -1,22 +1,16 @@
 import { UserType } from '@/utils/types'
 
 type GetUserRoutesType = {
-  type: UserType | string
+  type: UserType
 }
 
 export const getUserRoutes = ({ type }: GetUserRoutesType) => {
-  // Convert to string and normalize
-  const typeString = String(type).trim()
-  
-  // Handle both the correct and misspelled enum values
-  if (typeString === UserType.USER || typeString === 'User') {
-    return '/screens/(user)/dashboard/dashboard'
+  switch (type) {
+    case UserType.USER:
+      return '/screens/(user)/dashboard/dashboard'
+    case UserType.ADMININISTRATOR:
+      return '/screens/(admin)/dashboard/dashboard'
+    default:
+      return '/screens/(user)/dashboard/dashboard'
   }
-  
-  if (typeString === UserType.ADMININISTRATOR || typeString === 'Administrator') {
-    return '/screens/(admin)/dashboard/dashboard'
-  }
-
-  // Default to user dashboard for safety
-  return '/screens/(user)/dashboard/dashboard'
 }
