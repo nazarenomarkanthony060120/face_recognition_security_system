@@ -73,7 +73,8 @@ export type AddStudent = {
   studentId: string
   name: string
   contactNumber: string
-  address: string}
+  address: string
+}
 
 export enum HistoryStatusText {
   IN = 'In',

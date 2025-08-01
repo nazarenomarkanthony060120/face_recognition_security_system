@@ -10,10 +10,18 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import { LinearGradient } from 'expo-linear-gradient'
 import { useAuth } from '@/context/auth'
 import { getUserRoutes } from '@/features/common/part/getUserRoutes'
+import { UserType } from '@/utils/types'
 
 const index = () => {
   const router = useRouter()
-  const { user, loading, isVerified, authSession, isInitialized } = useAuth()
+  const {
+    loading,
+    isVerified,
+    authSession,
+    isInitialized,
+    user,
+    clearInvalidSession,
+  } = useAuth()
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<Error | null>(null)
 
@@ -45,6 +53,7 @@ const index = () => {
           console.log('- Session verified:', isVerified)
           console.log('- Session exists:', !!authSession)
           console.log('- User type:', authSession.userType)
+          console.log('- User type typeof:', typeof authSession.userType)
           console.log(
             '- Session expiry:',
             new Date(authSession.sessionExpiry).toLocaleString(),
@@ -55,8 +64,29 @@ const index = () => {
             '(not required for auto-login)',
           )
 
+          // Validate userType against enum values
+          const validUserTypes = Object.values(UserType)
+          if (!validUserTypes.includes(authSession.userType as UserType)) {
+            console.error(
+              '❌ Invalid user type in session:',
+              authSession.userType,
+            )
+            console.error('❌ Valid types are:', validUserTypes)
+            console.log('🧹 Clearing invalid session data...')
+            if (clearInvalidSession) {
+              await clearInvalidSession()
+            }
+            setError(new Error('Invalid session data detected'))
+            return
+          }
+
+          // Ensure the userType is properly typed instead of casting as any
+          const userType = authSession.userType as UserType
+          console.log('🔍 Processed user type:', userType)
+          console.log('🔍 Available UserType enum values:', validUserTypes)
+
           // Use stored user type from auth session for faster routing
-          const route = getUserRoutes({ type: authSession.userType as any })
+          const route = getUserRoutes({ type: userType })
           console.log('🚀 AUTO LOGIN: Attempting redirect to', route)
 
           try {

@@ -1,8 +1,8 @@
 import React, { createContext, useState, useEffect, useContext } from 'react'
 import { auth, onAuthStateChanged, User } from '@/lib/firestore'
-import { signOut } from 'firebase/auth'
 import { useRouter } from 'expo-router'
 import { hybridStorage, AuthSession } from '@/lib/hybridStorage'
+import { UserType } from '@/utils/types'
 
 type ContextProps = {
   user: User | null
@@ -13,6 +13,7 @@ type ContextProps = {
   checkAuthStatus: () => Promise<AuthSession | null>
   setUserVerified: (userType: string) => Promise<void>
   logout: () => Promise<void>
+  clearInvalidSession: () => Promise<void>
   getUserId: () => string | undefined
 }
 
@@ -65,9 +66,19 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const setUserVerified = async (userType: string) => {
     try {
       console.log('💾 Saving user verification to HybridStorage...')
+      console.log('📋 User type being saved:', userType)
+      console.log('📋 User type typeof:', typeof userType)
 
       if (!user?.uid) {
         throw new Error('Firebase user not available for saving verification')
+      }
+
+      // Validate that the userType is a valid UserType enum value
+      const validUserTypes = Object.values(UserType)
+      if (!validUserTypes.includes(userType as UserType)) {
+        console.warn('⚠️ Invalid user type provided:', userType)
+        console.warn('⚠️ Valid types are:', validUserTypes)
+        throw new Error(`Invalid user type: ${userType}`)
       }
 
       await hybridStorage.setUserVerified(userType, user.uid)
@@ -176,23 +187,27 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const logout = async () => {
     try {
       console.log('🚪 Logging out user...')
-      // Clear HybridStorage first
+      await auth?.signOut()
       await hybridStorage.clearAuthSession()
-      console.log('✅ HybridStorage cleared')
-
-      // Sign out from Firebase
-      await signOut(auth)
-      console.log('✅ Firebase sign out complete')
-
-      // Clear local state
+      setUser(null)
       setIsVerified(false)
       setAuthSession(null)
-
-      // The onAuthStateChanged will handle the rest
-      router.replace('/(auth)/login')
+      console.log('✅ Logout successful')
     } catch (error) {
       console.error('❌ Logout error:', error)
       throw error
+    }
+  }
+
+  const clearInvalidSession = async () => {
+    try {
+      console.log('🧹 Clearing invalid session data...')
+      await hybridStorage.clearAuthSession()
+      setIsVerified(false)
+      setAuthSession(null)
+      console.log('✅ Invalid session cleared')
+    } catch (error) {
+      console.error('❌ Failed to clear invalid session:', error)
     }
   }
 
@@ -204,9 +219,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
         isVerified,
         authSession,
         isInitialized,
-        checkAuthStatus,
         setUserVerified,
         logout,
+        clearInvalidSession,
         getUserId,
       }}
     >
