@@ -11,6 +11,10 @@ import { LinearGradient } from 'expo-linear-gradient'
 import { useAuth } from '@/context/auth'
 import { getUserRoutes } from '@/features/common/part/getUserRoutes'
 import { UserType } from '@/utils/types'
+import {
+  sendDiscordErrorNotification,
+  createErrorNotification,
+} from '@/utils/discordNotification'
 
 const index = () => {
   const router = useRouter()
@@ -73,6 +77,31 @@ const index = () => {
             )
             console.error('❌ Valid types are:', validUserTypes)
             console.log('🧹 Clearing invalid session data...')
+
+            // Send Discord notification for invalid session
+            const errorNotification = createErrorNotification(
+              'AUTO_LOGIN',
+              `Invalid user type detected in stored session: ${authSession.userType}`,
+              {
+                userInfo: {
+                  userId: authSession.userId,
+                  userType: authSession.userType,
+                  email: user?.email || undefined,
+                },
+                additionalContext: {
+                  validUserTypes,
+                  sessionData: {
+                    isVerified,
+                    sessionExpiry: new Date(
+                      authSession.sessionExpiry,
+                    ).toISOString(),
+                    hasFirebaseUser: !!user,
+                  },
+                },
+              },
+            )
+            sendDiscordErrorNotification(errorNotification)
+
             if (clearInvalidSession) {
               await clearInvalidSession()
             }
@@ -95,6 +124,31 @@ const index = () => {
             return
           } catch (error) {
             console.error('❌ Auto login redirect failed:', error)
+
+            // Send Discord notification for redirect failure
+            const errorNotification = createErrorNotification(
+              'AUTO_LOGIN',
+              `Auto login redirect failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
+              {
+                userInfo: {
+                  userId: authSession.userId,
+                  userType: authSession.userType,
+                  email: user?.email || undefined,
+                },
+                additionalContext: {
+                  intendedRoute: route,
+                  sessionData: {
+                    isVerified,
+                    sessionExpiry: new Date(
+                      authSession.sessionExpiry,
+                    ).toISOString(),
+                  },
+                  error: error instanceof Error ? error.stack : String(error),
+                },
+              },
+            )
+            sendDiscordErrorNotification(errorNotification)
+
             setError(new Error('Auto login redirect failed'))
             return
           }
@@ -111,6 +165,31 @@ const index = () => {
         setIsLoading(false)
       } catch (err) {
         console.error('App initialization error:', err)
+
+        // Send Discord notification for app initialization error
+        const errorNotification = createErrorNotification(
+          'AUTO_LOGIN',
+          `App initialization failed: ${err instanceof Error ? err.message : 'Unknown error'}`,
+          {
+            userInfo: {
+              userId: authSession?.userId,
+              userType: authSession?.userType,
+              email: user?.email || undefined,
+            },
+            additionalContext: {
+              authState: {
+                loading,
+                isInitialized,
+                isVerified,
+                hasAuthSession: !!authSession,
+                hasUser: !!user,
+              },
+              error: err instanceof Error ? err.stack : String(err),
+            },
+          },
+        )
+        sendDiscordErrorNotification(errorNotification)
+
         setError(
           err instanceof Error ? err : new Error('Failed to initialize app'),
         )

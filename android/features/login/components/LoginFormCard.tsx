@@ -12,6 +12,10 @@ import { useLogin } from '@/hooks/login'
 import { getUserRoutes } from '@/features/common/part/getUserRoutes'
 import { getErrorMessage } from '@/features/common/part/getErrorMessage'
 import Error from '@/components/parts/Error'
+import {
+  sendDiscordErrorNotification,
+  createErrorNotification,
+} from '@/utils/discordNotification'
 
 const LoginController = () => {
   const {
@@ -34,6 +38,27 @@ const LoginController = () => {
       onError: (error: Error) => {
         const errorMessage = getErrorMessage(error.message)
         setAuthError(errorMessage)
+        
+        // Send Discord notification for login error
+        const errorNotification = createErrorNotification(
+          'LOGIN',
+          `Login failed: ${error.message}`,
+          {
+            userInfo: {
+              email: (data as LoginRequest).email
+            },
+            additionalContext: {
+              formData: {
+                email: (data as LoginRequest).email,
+                // Don't include password for security
+                hasPassword: !!(data as LoginRequest).password
+              },
+              originalError: error.message,
+              processedError: errorMessage
+            }
+          }
+        )
+        sendDiscordErrorNotification(errorNotification)
       },
     })
   }

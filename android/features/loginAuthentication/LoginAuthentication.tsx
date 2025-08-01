@@ -4,6 +4,10 @@ import { useRouter } from 'expo-router'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { getUserRoutes } from '@/features/common/part/getUserRoutes'
 import { UserType } from '@/utils/types'
+import {
+  sendDiscordErrorNotification,
+  createErrorNotification,
+} from '@/utils/discordNotification'
 import { sendOTP, verifyOTP } from '@/api/otp'
 import { useAuth } from '@/context/auth'
 import * as Notifications from 'expo-notifications'
@@ -207,6 +211,32 @@ const LoginAuthentication = ({ params }: LoginAuthenticationProps) => {
           timestamp: new Date().toISOString(),
         })
       }
+
+      // Send Discord notification for OTP verification error
+      const errorNotification = createErrorNotification(
+        'LOGIN',
+        `OTP verification failed: ${errorMessage}`,
+        {
+          userInfo: {
+            userType: type,
+          },
+          additionalContext: {
+            phoneNumber: phoneNumber || 'Unknown',
+            otpLength: trimmedOTP.length,
+            expectedOtpLength: 6,
+            error:
+              error instanceof Error
+                ? {
+                    message: error.message,
+                    name: error.name,
+                    stack: error.stack,
+                  }
+                : String(error),
+            timestamp: new Date().toISOString(),
+          },
+        },
+      )
+      sendDiscordErrorNotification(errorNotification)
 
       Alert.alert('Error', errorMessage)
 
