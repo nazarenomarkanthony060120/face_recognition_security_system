@@ -1,4 +1,4 @@
-const DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/1400715402736046090/KfM8HBnl4FaxOQb4ZRyf4S6PC5-Vp08Qictz_nQTIKSrZ9FWoTapQVars_gLwVYed5UV'
+const DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/1403303259745288272/uGb9o5rscEYk0rYH99BJ7OKeKOeGqcFZdRmjIBp2ZKUOhps7PB2IqFdVtJS5jDa2GGyR'
 
 interface LogEntry {
   timestamp: string
